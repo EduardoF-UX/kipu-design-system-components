@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kipu Design System - Component Library</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        h1 {
+            color: #0F4888;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            background: #f0f7ff;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1565C0;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        .category {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        
+        .category h2 {
+            color: #0F4888;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e8f0fe;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .category h2 .count {
+            background: #1565C0;
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: normal;
+        }
+        
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .component {
+            background: #f8fafc;
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .component:hover {
+            background: #e8f0fe;
+            border-color: #1565C0;
+            transform: translateY(-1px);
+        }
+        
+        .component-name {
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 0.9rem;
+        }
+        
+        .component-type {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        
+        .component-type.has-page {
+            color: #059669;
+        }
+        
+        .component-type.component_set {
+            color: #1565C0;
+        }
+        
+        .view-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #1565C0;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .view-link svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            color: #666;
+            font-size: 0.875rem;
+        }
+        
+        footer a {
+            color: #1565C0;
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .legend-dot.interactive {
+            background: #059669;
+        }
+        
+        .legend-dot.static {
+            background: #94a3b8;
+        }
+        
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.75rem;
+            }
+            
+            .stats {
+                gap: 1rem;
+            }
+            
+            .component-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Kipu Design System</h1>
+            <p class="subtitle">Interactive Component Library with React Examples</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">140+</div>
+                    <div class="stat-label">Total Components</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">17</div>
+                    <div class="stat-label">Interactive Pages</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Categories</div>
+                </div>
+            </div>
+            <div class="legend">
+                <div class="legend-item">
+                    <span class="legend-dot interactive"></span>
+                    <span>Interactive Demo Available</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot static"></span>
+                    <span>Component Reference</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="category">
+            <h2>Buttons <span class="count">21</span></h2>
+            <div class="component-grid">
+                <a href="components/buttons/big-button.html" class="component">
+                    <div class="component-name">Big Button</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <a href="components/buttons/small-button.html" class="component">
+                    <div class="component-name">Small Button</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <a href="components/buttons/icon-button.html" class="component">
+                    <div class="component-name">Icon Button</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <a href="components/buttons/fab-button.html" class="component">
+                    <div class="component-name">FAB Icons</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <a href="components/buttons/segmented-buttons.html" class="component">
+                    <div class="component-name">Segmented Buttons</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <div class="component">
+                    <div class="component-name">Inline Action Icon Buttons</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Header Icon Button</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Group of button - Left Side</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Group of button - Right Side</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Group of button - Center Side</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">aiBig_Button</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">aiIcon_Button</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Scheduler Selector</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Selector</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Form Controls <span class="count">18</span></h2>
+            <div class="component-grid">
+                <a href="components/forms/search.html" class="component">
+                    <div class="component-name">Search</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <a href="components/forms/text-field.html" class="component">
+                    <div class="component-name">Text Field</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <a href="components/forms/checkbox.html" class="component">
+                    <div class="component-name">Checkboxes</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <a href="components/forms/switch.html" class="component">
+                    <div class="component-name">Switches</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <a href="components/forms/dropdown.html" class="component">
+                    <div class="component-name">Dropdowns</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <div class="component">
+                    <div class="component-name">Text Area</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Radio buttons</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Checkmarks or Radio Buttons Group</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Dropdown Option Items</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Icon Dropdown</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Dropdown Search</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">aiChat_Input</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Sort By</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Cards & Containers <span class="count">14</span></h2>
+            <div class="component-grid">
+                <a href="components/cards/card.html" class="component">
+                    <div class="component-name">Cards</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <div class="component">
+                    <div class="component-name">Modal Card</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Patient Card</div>
+                    <div class="component-type">Component</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Patient Card - BottomSheet</div>
+                    <div class="component-type">Component</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">EMR SSO Cards</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">aiCards</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">aiAnalysis_Card</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Modal Message</div>
+                    <div class="component-type">Component</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Accordion Content</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Tables & Data Display <span class="count">17</span></h2>
+            <div class="component-grid">
+                <a href="components/tables/table.html" class="component">
+                    <div class="component-name">Table</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <div class="component">
+                    <div class="component-name">Table Template</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Table Header</div>
+                    <div class="component-type">Component</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Table Column Labels</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Table Content Default</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Data Filters</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Data Pagination</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Navigation <span class="count">19</span></h2>
+            <div class="component-grid">
+                <a href="components/navigation/global-header.html" class="component">
+                    <div class="component-name">Kipu Global Header</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <a href="components/navigation/tabs.html" class="component">
+                    <div class="component-name">System Tabs</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <a href="components/navigation/left-sidebar.html" class="component">
+                    <div class="component-name">Left Sidebar Navigation</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <div class="component">
+                    <div class="component-name">Kipu Navigation Item</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Mobile Navigation Bar</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Navigation drawer</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Global Header Selector</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">EMR Facility Navigation</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Alerts & Notifications <span class="count">9</span></h2>
+            <div class="component-grid">
+                <a href="components/alerts/alert-banner.html" class="component">
+                    <div class="component-name">Alert Banner</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <div class="component">
+                    <div class="component-name">Patient Alert Indicator</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">RCM Alert Icon</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Metric Indicator</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Avatars & User Elements <span class="count">5</span></h2>
+            <div class="component-grid">
+                <a href="components/avatars/avatar.html" class="component">
+                    <div class="component-name">Avatar Iconz</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <div class="component">
+                    <div class="component-name">Column Type Avatar</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Mobile Avatar Nav Panel</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Desktop Avatar Nav Panel</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Tooltips & Feedback <span class="count">3</span></h2>
+            <div class="component-grid">
+                <a href="components/tooltips/tooltip.html" class="component">
+                    <div class="component-name">Tooltip</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+                <div class="component">
+                    <div class="component-name">Contextual Tooltip</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <a href="components/progress/status-badge.html" class="component">
+                    <div class="component-name">Status Badges</div>
+                    <div class="component-type has-page">Interactive Demo</div>
+                    <span class="view-link">
+                        View Component
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </a>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Calendar & Date Pickers <span class="count">16</span></h2>
+            <div class="component-grid">
+                <div class="component">
+                    <div class="component-name">Calendar and Time Picker</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Calendar with Date Range</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Calendar Frame - Day</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Day</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Year Selector</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Hour Time Selector</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Icons & Branding <span class="count">15</span></h2>
+            <div class="component-grid">
+                <div class="component">
+                    <div class="component-name">Kipu Product Icon</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Kipu K Icon</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">aiIcons</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Clients Logo</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">RCM Help Icon</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Progress & Status <span class="count">5</span></h2>
+            <div class="component-grid">
+                <div class="component">
+                    <div class="component-name">Component_Step Progress Small</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Component_Step Progress Big</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Helix Mobile Views</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="category">
+            <h2>Headers & Miniheaders <span class="count">12</span></h2>
+            <div class="component-grid">
+                <div class="component">
+                    <div class="component-name">MiniHeader</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Header Search</div>
+                    <div class="component-type">Component</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">Patient Card Miniheader</div>
+                    <div class="component-type">Component</div>
+                </div>
+                <div class="component">
+                    <div class="component-name">CRM-Header Options</div>
+                    <div class="component-type component_set">Component Set</div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Generated from <a href="https://www.figma.com/design/s12FnJCGxtbkFqYHHMPTkd/Kipu-Design-System" target="_blank">Kipu Design System</a> on Figma</p>
+            <p style="margin-top: 0.5rem;">Components implemented as reusable React components with interactive demos</p>
+            <p style="margin-top: 0.5rem; color: #999;">April 3, 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

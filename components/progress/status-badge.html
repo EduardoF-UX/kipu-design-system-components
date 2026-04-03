@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Badge - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        // Status Badge Component - Kipu Design System
+        const StatusBadge = ({ 
+            status,
+            label,
+            size = 'medium',
+        }) => {
+            // Kipu Design System colors from Figma
+            const statusColors = {
+                active: '#CADFFE',      // Light Blue/light blue-500-main (Active, In-Progress)
+                inProgress: '#CADFFE',  // Light Blue/light blue-500-main
+                completed: '#B8E7BA',   // Light Green/light-green-500-main
+                cancelled: '#F29278',   // Red/red-300
+                neutral: '#CCCCCC',     // Neutral/gray-04
+                // Medical status mappings
+                admitted: '#B8E7BA',    // Light Green
+                discharged: '#CCCCCC',  // Gray
+                scheduled: '#CADFFE',   // Light Blue
+                urgent: '#F29278',      // Red
+                pending: '#CADFFE',     // Light Blue
+            };
+
+            // Size configurations from Figma
+            const sizes = {
+                small: { 
+                    padding: '5px 14px', 
+                    fontSize: '12px',
+                    lineHeight: '14px',
+                },
+                medium: { 
+                    padding: '4px 20px', 
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                },
+            };
+
+            const statusKey = status?.toLowerCase().replace(/[\s-]/g, '');
+            const bgColor = statusColors[statusKey] || statusColors.neutral;
+            const sizeConfig = sizes[size] || sizes.medium;
+
+            const badgeStyles = {
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: sizeConfig.padding,
+                fontSize: sizeConfig.fontSize,
+                lineHeight: sizeConfig.lineHeight,
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 500,
+                borderRadius: '4px',
+                background: bgColor,
+                color: '#000000',
+                whiteSpace: 'nowrap',
+                textAlign: 'center',
+            };
+
+            return (
+                <span style={badgeStyles}>
+                    {label || status}
+                </span>
+            );
+        };
+
+        // Demo App
+        const App = () => {
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Progress</span>
+                            <span>/</span>
+                            <span>Status Badge</span>
+                        </div>
+                        <h1>Status Badge</h1>
+                        <p className="description">
+                            Status badges are compact labels that indicate the current state of an item 
+                            or process using color-coded backgrounds. Available in medium and small sizes 
+                            with rounded rectangle styling.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>Status Types (Medium)</h2>
+                        <div className="preview-area" style={{ gap: '12px', flexWrap: 'wrap' }}>
+                            <StatusBadge status="active" label="Active" />
+                            <StatusBadge status="inProgress" label="In-Progress" />
+                            <StatusBadge status="completed" label="Completed" />
+                            <StatusBadge status="cancelled" label="Cancelled" />
+                            <StatusBadge status="neutral" label="Badge" />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Status Types (Small)</h2>
+                        <div className="preview-area" style={{ gap: '12px', flexWrap: 'wrap' }}>
+                            <StatusBadge status="active" label="Active" size="small" />
+                            <StatusBadge status="inProgress" label="In-Progress" size="small" />
+                            <StatusBadge status="completed" label="Completed" size="small" />
+                            <StatusBadge status="cancelled" label="Cancelled" size="small" />
+                            <StatusBadge status="neutral" label="Badge" size="small" />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Sizes Comparison</h2>
+                        <div className="preview-area" style={{ gap: '16px', alignItems: 'center' }}>
+                            <div className="preview-column">
+                                <span className="variant-label">Small</span>
+                                <StatusBadge status="active" label="Active" size="small" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Medium</span>
+                                <StatusBadge status="active" label="Active" size="medium" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Medical Status Examples</h2>
+                        <div className="preview-area" style={{ gap: '12px', flexWrap: 'wrap' }}>
+                            <StatusBadge status="admitted" label="Admitted" />
+                            <StatusBadge status="inProgress" label="In Progress" />
+                            <StatusBadge status="scheduled" label="Scheduled" />
+                            <StatusBadge status="discharged" label="Discharged" />
+                            <StatusBadge status="urgent" label="Urgent" />
+                            <StatusBadge status="pending" label="Pending" />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Design Specifications</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Medium (Default)</th>
+                                    <th>Small</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Padding</td>
+                                    <td>4px 20px</td>
+                                    <td>5px 14px</td>
+                                </tr>
+                                <tr>
+                                    <td>Font Size</td>
+                                    <td>14px</td>
+                                    <td>12px</td>
+                                </tr>
+                                <tr>
+                                    <td>Line Height</td>
+                                    <td>20px</td>
+                                    <td>14px</td>
+                                </tr>
+                                <tr>
+                                    <td>Border Radius</td>
+                                    <td>4px</td>
+                                    <td>4px</td>
+                                </tr>
+                                <tr>
+                                    <td>Font</td>
+                                    <td>Roboto Medium</td>
+                                    <td>Roboto Medium</td>
+                                </tr>
+                                <tr>
+                                    <td>Text Color</td>
+                                    <td>#000000 (Black)</td>
+                                    <td>#000000 (Black)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h3 style={{ marginTop: '24px' }}>Status Colors</h3>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Background Color</th>
+                                    <th>Token</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Active / In-Progress</td>
+                                    <td>#CADFFE</td>
+                                    <td>Light Blue/light blue-500-main</td>
+                                </tr>
+                                <tr>
+                                    <td>Completed / Admitted</td>
+                                    <td>#B8E7BA</td>
+                                    <td>Light Green/light-green-500-main</td>
+                                </tr>
+                                <tr>
+                                    <td>Cancelled / Urgent</td>
+                                    <td>#F29278</td>
+                                    <td>Red/red-300</td>
+                                </tr>
+                                <tr>
+                                    <td>Neutral / Discharged</td>
+                                    <td>#CCCCCC</td>
+                                    <td>Neutral/gray-04</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>status</code></td>
+                                    <td><code>'active' | 'inProgress' | 'completed' | 'cancelled' | 'neutral' | 'admitted' | 'discharged' | 'scheduled' | 'urgent' | 'pending'</code></td>
+                                    <td><code>'neutral'</code></td>
+                                    <td>Status type determining background color</td>
+                                </tr>
+                                <tr>
+                                    <td><code>label</code></td>
+                                    <td><code>string</code></td>
+                                    <td>-</td>
+                                    <td>Text to display (defaults to status name)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>size</code></td>
+                                    <td><code>'small' | 'medium'</code></td>
+                                    <td><code>'medium'</code></td>
+                                    <td>Badge size</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { StatusBadge } from '@kipu/design-system';
+
+// Basic status badge
+<StatusBadge status="active" label="Active" />
+
+// Different statuses
+<StatusBadge status="completed" label="Completed" />
+<StatusBadge status="cancelled" label="Cancelled" />
+<StatusBadge status="inProgress" label="In-Progress" />
+
+// Small size
+<StatusBadge status="active" label="Active" size="small" />
+
+// Medical statuses
+<StatusBadge status="admitted" label="Admitted" />
+<StatusBadge status="urgent" label="Urgent" />
+
+// In a table cell
+<TableCell>
+  <StatusBadge status={patient.status} label={patient.statusLabel} />
+</TableCell>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

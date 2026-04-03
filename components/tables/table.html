@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Kipu Design System Table Colors (from Figma)
+        const tableColors = {
+            hoverBg: '#F7F2FF',           // Hover row background
+            rowDivider: '#EFE5FE',        // Row divider color
+            headerBg: '#FFFFFF',          // Header background
+            headerText: '#000000',        // Header text color
+            cellText: '#000000',          // Cell text color
+            selectedBg: '#F0E8FA',        // Selected row background (Purple 50)
+            sortActive: '#6C18C9',        // Sort icon active (Purple 500)
+            sortInactive: '#CCCCCC',      // Sort icon inactive (Gray 04)
+        };
+
+        // Table Components - Kipu Design System
+        const Table = ({ children, size = 'regular', hoverable = true }) => (
+            <div style={{ overflowX: 'auto' }}>
+                <table style={{ 
+                    width: '100%', 
+                    borderCollapse: 'collapse',
+                    fontFamily: "'Roboto', sans-serif",
+                    fontSize: '14px',
+                }}>
+                    {children}
+                </table>
+            </div>
+        );
+
+        const TableHead = ({ children }) => (
+            <thead style={{ background: tableColors.headerBg }}>
+                {children}
+            </thead>
+        );
+
+        const TableBody = ({ children }) => (
+            <tbody>{children}</tbody>
+        );
+
+        const TableRow = ({ children, selected = false, onClick, size = 'regular' }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            
+            // Row heights from Figma: Condensed 40px, Regular 48px, Relaxed 56px
+            const rowHeights = {
+                condensed: '40px',
+                regular: '48px',
+                relaxed: '56px',
+            };
+            
+            return (
+                <tr 
+                    style={{
+                        background: selected ? tableColors.selectedBg : (isHovered ? tableColors.hoverBg : 'transparent'),
+                        cursor: onClick ? 'pointer' : 'default',
+                        transition: 'background 0.15s ease',
+                        height: rowHeights[size],
+                    }}
+                    onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    {children}
+                </tr>
+            );
+        };
+
+        const TableHeader = ({ children, sortable, sortDirection, onSort, align = 'left' }) => (
+            <th 
+                style={{
+                    padding: '14px 16px',
+                    textAlign: align,
+                    fontFamily: "'Roboto', sans-serif",
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    color: tableColors.headerText,
+                    borderBottom: `1px solid ${tableColors.rowDivider}`,
+                    cursor: sortable ? 'pointer' : 'default',
+                    userSelect: 'none',
+                    whiteSpace: 'nowrap',
+                }}
+                onClick={sortable ? onSort : undefined}
+            >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    {children}
+                    {sortable && (
+                        <svg 
+                            width="24" 
+                            height="24" 
+                            viewBox="0 0 24 24" 
+                            fill={sortDirection ? tableColors.sortActive : tableColors.sortInactive}
+                            style={{ transform: sortDirection === 'asc' ? 'rotate(180deg)' : 'none' }}
+                        >
+                            <path d="M7 10l5 5 5-5H7z"/>
+                        </svg>
+                    )}
+                </span>
+            </th>
+        );
+
+        const TableCell = ({ children, align = 'left' }) => (
+            <td style={{
+                padding: '14px 16px',
+                textAlign: align,
+                fontFamily: "'Roboto', sans-serif",
+                fontSize: '14px',
+                borderBottom: `1px solid ${tableColors.rowDivider}`,
+                color: tableColors.cellText,
+            }}>
+                {children}
+            </td>
+        );
+
+        // Status Badge - Using Kipu Design System colors
+        const StatusBadge = ({ status }) => {
+            // Kipu Status Badge colors from Figma
+            const colors = {
+                active: { bg: '#CADFFE', text: '#000000' },      // Light Blue
+                'in progress': { bg: '#CADFFE', text: '#000000' }, // Light Blue
+                inactive: { bg: '#CCCCCC', text: '#000000' },    // Gray
+                pending: { bg: '#CADFFE', text: '#000000' },     // Light Blue
+                completed: { bg: '#B8E7BA', text: '#000000' },   // Light Green
+                cancelled: { bg: '#F29278', text: '#000000' },   // Red
+            };
+            const { bg, text } = colors[status?.toLowerCase()] || colors.inactive;
+            return (
+                <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '4px 20px',
+                    borderRadius: '4px',
+                    fontFamily: "'Roboto', sans-serif",
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    background: bg,
+                    color: text,
+                    textTransform: 'capitalize',
+                }}>
+                    {status}
+                </span>
+            );
+        };
+
+        // Demo App
+        const App = () => {
+            const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+            const [selectedRows, setSelectedRows] = useState([]);
+
+            const patients = [
+                { id: 1, name: 'John Doe', mrn: 'MTY45678', status: 'active', admitDate: '2026-03-01' },
+                { id: 2, name: 'Jane Smith', mrn: 'MTY45679', status: 'pending', admitDate: '2026-03-05' },
+                { id: 3, name: 'Bob Johnson', mrn: 'MTY45680', status: 'active', admitDate: '2026-02-28' },
+                { id: 4, name: 'Alice Brown', mrn: 'MTY45681', status: 'inactive', admitDate: '2026-01-15' },
+                { id: 5, name: 'Charlie Wilson', mrn: 'MTY45682', status: 'active', admitDate: '2026-03-10' },
+            ];
+
+            const handleSort = (key) => {
+                setSortConfig(prev => ({
+                    key,
+                    direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+                }));
+            };
+
+            const toggleRow = (id) => {
+                setSelectedRows(prev => 
+                    prev.includes(id) ? prev.filter(r => r !== id) : [...prev, id]
+                );
+            };
+
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Tables</span>
+                            <span>/</span>
+                            <span>Table</span>
+                        </div>
+                        <h1>Table</h1>
+                        <p className="description">
+                            Tables display sets of data organized into rows and columns. 
+                            Available in condensed (40px), regular (48px), and relaxed (56px) row heights.
+                            Supports sorting, selection, hover states, and action columns.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>Regular Data Table</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                            Row height: 48px • Hover: #F7F2FF • Divider: #EFE5FE
+                        </p>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeader>Name</TableHeader>
+                                    <TableHeader>MRN</TableHeader>
+                                    <TableHeader>Status</TableHeader>
+                                    <TableHeader>Admit Date</TableHeader>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {patients.map(patient => (
+                                    <TableRow key={patient.id}>
+                                        <TableCell>{patient.name}</TableCell>
+                                        <TableCell>{patient.mrn}</TableCell>
+                                        <TableCell><StatusBadge status={patient.status} /></TableCell>
+                                        <TableCell>{patient.admitDate}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Sortable Table</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666' }}>
+                            Click on column headers to sort.
+                        </p>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeader 
+                                        sortable 
+                                        sortDirection={sortConfig.key === 'name' ? sortConfig.direction : null}
+                                        onSort={() => handleSort('name')}
+                                    >
+                                        Name
+                                    </TableHeader>
+                                    <TableHeader 
+                                        sortable 
+                                        sortDirection={sortConfig.key === 'mrn' ? sortConfig.direction : null}
+                                        onSort={() => handleSort('mrn')}
+                                    >
+                                        MRN
+                                    </TableHeader>
+                                    <TableHeader>Status</TableHeader>
+                                    <TableHeader 
+                                        sortable 
+                                        sortDirection={sortConfig.key === 'admitDate' ? sortConfig.direction : null}
+                                        onSort={() => handleSort('admitDate')}
+                                    >
+                                        Admit Date
+                                    </TableHeader>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {patients.map(patient => (
+                                    <TableRow key={patient.id}>
+                                        <TableCell>{patient.name}</TableCell>
+                                        <TableCell>{patient.mrn}</TableCell>
+                                        <TableCell><StatusBadge status={patient.status} /></TableCell>
+                                        <TableCell>{patient.admitDate}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Selectable Rows</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666' }}>
+                            Click on rows to select them. Selected: {selectedRows.length > 0 ? selectedRows.join(', ') : 'None'}
+                        </p>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeader>Name</TableHeader>
+                                    <TableHeader>MRN</TableHeader>
+                                    <TableHeader>Status</TableHeader>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {patients.map(patient => (
+                                    <TableRow 
+                                        key={patient.id}
+                                        selected={selectedRows.includes(patient.id)}
+                                        onClick={() => toggleRow(patient.id)}
+                                    >
+                                        <TableCell>{patient.name}</TableCell>
+                                        <TableCell>{patient.mrn}</TableCell>
+                                        <TableCell><StatusBadge status={patient.status} /></TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Design Specifications</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Value</th>
+                                    <th>Token</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Row Height (Condensed)</td>
+                                    <td>40px</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Row Height (Regular)</td>
+                                    <td>48px</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Row Height (Relaxed)</td>
+                                    <td>56px</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Hover Background</td>
+                                    <td>#F7F2FF</td>
+                                    <td>Purple/purple-25</td>
+                                </tr>
+                                <tr>
+                                    <td>Row Divider</td>
+                                    <td>1px solid #EFE5FE</td>
+                                    <td>Purple/purple-100</td>
+                                </tr>
+                                <tr>
+                                    <td>Selected Background</td>
+                                    <td>#F0E8FA</td>
+                                    <td>Purple/purple-50</td>
+                                </tr>
+                                <tr>
+                                    <td>Cell Padding</td>
+                                    <td>14px 16px</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Font</td>
+                                    <td>Roboto, 14px</td>
+                                    <td>Body</td>
+                                </tr>
+                                <tr>
+                                    <td>Header Font Weight</td>
+                                    <td>500 (Medium)</td>
+                                    <td>Body Med</td>
+                                </tr>
+                                <tr>
+                                    <td>Text Color</td>
+                                    <td>#000000</td>
+                                    <td>Neutral/black</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>Table</code></td>
+                                    <td><code>size</code></td>
+                                    <td><code>'condensed' | 'regular' | 'relaxed'</code></td>
+                                    <td>Row height variant</td>
+                                </tr>
+                                <tr>
+                                    <td><code>TableRow</code></td>
+                                    <td><code>selected</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td>Highlight row as selected</td>
+                                </tr>
+                                <tr>
+                                    <td><code>TableRow</code></td>
+                                    <td><code>size</code></td>
+                                    <td><code>'condensed' | 'regular' | 'relaxed'</code></td>
+                                    <td>Row height (40px/48px/56px)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>TableHeader</code></td>
+                                    <td><code>sortable</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td>Enable sorting</td>
+                                </tr>
+                                <tr>
+                                    <td><code>TableHeader</code></td>
+                                    <td><code>sortDirection</code></td>
+                                    <td><code>'asc' | 'desc'</code></td>
+                                    <td>Current sort direction</td>
+                                </tr>
+                                <tr>
+                                    <td><code>TableCell</code></td>
+                                    <td><code>align</code></td>
+                                    <td><code>'left' | 'center' | 'right'</code></td>
+                                    <td>Text alignment</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@kipu/design-system';
+
+<Table>
+  <TableHead>
+    <TableRow>
+      <TableHeader sortable onSort={() => handleSort('name')}>
+        Name
+      </TableHeader>
+      <TableHeader>Status</TableHeader>
+    </TableRow>
+  </TableHead>
+  <TableBody>
+    {data.map(item => (
+      <TableRow key={item.id} onClick={() => selectRow(item.id)}>
+        <TableCell>{item.name}</TableCell>
+        <TableCell>
+          <StatusBadge status={item.status} />
+        </TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

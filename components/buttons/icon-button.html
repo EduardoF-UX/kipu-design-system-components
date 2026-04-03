@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Button - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Icon Button Component
+        const IconButton = ({ 
+            icon,
+            variant = 'standard',
+            size = 'medium',
+            onClick,
+            disabled = false,
+            ariaLabel,
+            toggled = false,
+        }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            const [isPressed, setIsPressed] = useState(false);
+
+            const sizes = {
+                small: { size: 32, iconSize: 18 },
+                medium: { size: 40, iconSize: 24 },
+                large: { size: 48, iconSize: 28 },
+            };
+
+            const { size: btnSize, iconSize } = sizes[size];
+
+            const baseStyles = {
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: btnSize,
+                height: btnSize,
+                borderRadius: '50%',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                border: 'none',
+                outline: 'none',
+                opacity: disabled ? 0.5 : 1,
+            };
+
+            const variantStyles = {
+                standard: {
+                    background: isHovered && !disabled ? '#e8f0fe' : 'transparent',
+                    color: toggled ? '#1565C0' : '#5f6368',
+                },
+                filled: {
+                    background: disabled ? '#cccccc' : (isHovered ? '#0F4888' : '#1565C0'),
+                    color: '#FFFFFF',
+                },
+                tonal: {
+                    background: disabled ? '#ececec' : (isHovered ? '#b8d4fc' : '#CADFFE'),
+                    color: disabled ? '#999999' : '#0F4888',
+                },
+                outlined: {
+                    background: isHovered && !disabled ? '#e8f0fe' : 'transparent',
+                    color: disabled ? '#cccccc' : '#1565C0',
+                    border: `2px solid ${disabled ? '#cccccc' : '#1565C0'}`,
+                },
+            };
+
+            return (
+                <button
+                    style={{ ...baseStyles, ...variantStyles[variant] }}
+                    onClick={onClick}
+                    disabled={disabled}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    onMouseDown={() => setIsPressed(true)}
+                    onMouseUp={() => setIsPressed(false)}
+                    aria-label={ariaLabel}
+                >
+                    <span style={{ display: 'flex', width: iconSize, height: iconSize }}>
+                        {icon}
+                    </span>
+                </button>
+            );
+        };
+
+        // Icons
+        const CloseIcon = () => (
+            <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+        );
+
+        const SettingsIcon = () => (
+            <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%">
+                <path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+            </svg>
+        );
+
+        const FavoriteIcon = ({ filled }) => (
+            <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%">
+                {filled ? (
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                ) : (
+                    <path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/>
+                )}
+            </svg>
+        );
+
+        const ShareIcon = () => (
+            <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%">
+                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+            </svg>
+        );
+
+        const MoreIcon = () => (
+            <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%">
+                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+        );
+
+        // Demo App
+        const App = () => {
+            const [isFavorite, setIsFavorite] = useState(false);
+
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Buttons</span>
+                            <span>/</span>
+                            <span>Icon Button</span>
+                        </div>
+                        <h1>Icon Button</h1>
+                        <p className="description">
+                            Icon buttons display actions in a compact layout. They can represent opening actions 
+                            such as opening an overflow menu or search, or represent binary actions that can be 
+                            toggled on and off, such as favorite or bookmark.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>Variants</h2>
+                        <div className="preview-area">
+                            <div className="preview-column">
+                                <span className="variant-label">Standard</span>
+                                <IconButton icon={<SettingsIcon />} variant="standard" ariaLabel="Settings" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Filled</span>
+                                <IconButton icon={<SettingsIcon />} variant="filled" ariaLabel="Settings" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Tonal</span>
+                                <IconButton icon={<SettingsIcon />} variant="tonal" ariaLabel="Settings" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Outlined</span>
+                                <IconButton icon={<SettingsIcon />} variant="outlined" ariaLabel="Settings" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Sizes</h2>
+                        <div className="preview-area">
+                            <div className="preview-column">
+                                <span className="variant-label">Small (32px)</span>
+                                <IconButton icon={<CloseIcon />} size="small" ariaLabel="Close" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Medium (40px)</span>
+                                <IconButton icon={<CloseIcon />} size="medium" ariaLabel="Close" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Large (48px)</span>
+                                <IconButton icon={<CloseIcon />} size="large" ariaLabel="Close" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>States</h2>
+                        <div className="state-grid">
+                            <div className="state-item">
+                                <span className="label">Enabled</span>
+                                <IconButton icon={<SettingsIcon />} ariaLabel="Settings" />
+                            </div>
+                            <div className="state-item">
+                                <span className="label">Disabled</span>
+                                <IconButton icon={<SettingsIcon />} disabled ariaLabel="Settings" />
+                            </div>
+                            <div className="state-item">
+                                <span className="label">Toggled</span>
+                                <IconButton icon={<FavoriteIcon filled />} toggled ariaLabel="Favorite" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Toggle Example</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666' }}>Click the heart to toggle favorite state.</p>
+                        <div className="preview-area">
+                            <IconButton 
+                                icon={<FavoriteIcon filled={isFavorite} />} 
+                                toggled={isFavorite}
+                                onClick={() => setIsFavorite(!isFavorite)}
+                                ariaLabel="Toggle favorite" 
+                            />
+                            <span style={{ color: '#666' }}>
+                                {isFavorite ? 'Favorited!' : 'Click to favorite'}
+                            </span>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Common Uses</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '1.5rem' }}>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <span style={{ color: '#666', width: '120px' }}>Card actions:</span>
+                                <IconButton icon={<FavoriteIcon />} ariaLabel="Favorite" />
+                                <IconButton icon={<ShareIcon />} ariaLabel="Share" />
+                                <IconButton icon={<MoreIcon />} ariaLabel="More options" />
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <span style={{ color: '#666', width: '120px' }}>Modal close:</span>
+                                <IconButton icon={<CloseIcon />} variant="standard" ariaLabel="Close modal" />
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <span style={{ color: '#666', width: '120px' }}>Settings:</span>
+                                <IconButton icon={<SettingsIcon />} variant="filled" ariaLabel="Settings" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>icon</code></td>
+                                    <td><code>ReactNode</code></td>
+                                    <td>Required</td>
+                                    <td>The icon to display</td>
+                                </tr>
+                                <tr>
+                                    <td><code>variant</code></td>
+                                    <td><code>'standard' | 'filled' | 'tonal' | 'outlined'</code></td>
+                                    <td><code>'standard'</code></td>
+                                    <td>The visual style variant</td>
+                                </tr>
+                                <tr>
+                                    <td><code>size</code></td>
+                                    <td><code>'small' | 'medium' | 'large'</code></td>
+                                    <td><code>'medium'</code></td>
+                                    <td>The size of the button</td>
+                                </tr>
+                                <tr>
+                                    <td><code>disabled</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Whether the button is disabled</td>
+                                </tr>
+                                <tr>
+                                    <td><code>toggled</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Whether the button is in toggled state</td>
+                                </tr>
+                                <tr>
+                                    <td><code>ariaLabel</code></td>
+                                    <td><code>string</code></td>
+                                    <td>-</td>
+                                    <td>Accessibility label (required for icon-only buttons)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { IconButton } from '@kipu/design-system';
+import { Close, Settings, Favorite } from '@kipu/icons';
+
+// Basic usage
+<IconButton icon={<Settings />} ariaLabel="Settings" />
+
+// Different variants
+<IconButton icon={<Close />} variant="filled" ariaLabel="Close" />
+
+// Toggle pattern
+const [isFavorite, setIsFavorite] = useState(false);
+<IconButton 
+  icon={<Favorite filled={isFavorite} />} 
+  toggled={isFavorite}
+  onClick={() => setIsFavorite(!isFavorite)}
+  ariaLabel="Toggle favorite" 
+/>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kipu EMR Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #F5F5F5;
+            min-height: 100vh;
+        }
+        #root {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        // ==========================================
+        // KIPU DESIGN SYSTEM TOKENS
+        // ==========================================
+        const colors = {
+            // Primary Purple
+            purple500: '#6C18C9',
+            purple700: '#4D118F',
+            purple100: '#EFE5FE',
+            purple50: '#F7F2FF',
+            purple25: '#F0E8FA',
+            // Blues
+            blue500: '#1565C0',
+            blue600: '#0F4888',
+            blue100: '#EFF5FF',
+            blue50: '#DBEAFE',
+            // Neutrals
+            white: '#FFFFFF',
+            black: '#000000',
+            gray02: '#F0F0F0',
+            gray03: '#E0E0E0',
+            gray04: '#CCCCCC',
+            gray05: '#999999',
+            gray06: '#666666',
+            gray07: '#333333',
+            // Status
+            green500: '#2E7D32',
+            green50: '#E8F5E9',
+            green100: '#B8E7BA',
+            red500: '#E50000',
+            red50: '#FDEFEB',
+            orange500: '#D0872E',
+            yellow50: '#FDFAE6',
+        };
+
+        // ==========================================
+        // ICONS
+        // ==========================================
+        const AppsIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/>
+            </svg>
+        );
+
+        const SearchIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14Z"/>
+            </svg>
+        );
+
+        const AIIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M19 9L20.25 6.25L23 5L20.25 3.75L19 1L17.75 3.75L15 5L17.75 6.25L19 9ZM11.5 9.5L9 4L6.5 9.5L1 12L6.5 14.5L9 20L11.5 14.5L17 12L11.5 9.5ZM19 15L17.75 17.75L15 19L17.75 20.25L19 23L20.25 20.25L23 19L20.25 17.75L19 15Z"/>
+            </svg>
+        );
+
+        const IncomingIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM12 10C13.1 10 14 10.9 14 12C14 13.1 13.1 14 12 14C10.9 14 10 13.1 10 12C10 10.9 10.9 10 12 10ZM16 18H8V17C8 15.67 10.67 15 12 15C13.33 15 16 15.67 16 17V18ZM13 9V3.5L18.5 9H13Z"/>
+            </svg>
+        );
+
+        const NotificationsIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16ZM16 17H8V11C8 8.52 9.51 6.5 12 6.5C14.49 6.5 16 8.52 16 11V17Z"/>
+            </svg>
+        );
+
+        const DownloadIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M19 9H15V3H9V9H5L12 16L19 9ZM5 18V20H19V18H5Z"/>
+            </svg>
+        );
+
+        const EmailIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z"/>
+            </svg>
+        );
+
+        const ChevronDownIcon = ({ color = 'white' }) => (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill={color}>
+                <path d="M7 10l5 5 5-5H7z"/>
+            </svg>
+        );
+
+        const DashboardIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+            </svg>
+        );
+
+        const PatientsIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+            </svg>
+        );
+
+        const CalendarIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/>
+            </svg>
+        );
+
+        const ReportsIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+            </svg>
+        );
+
+        const SettingsIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+            </svg>
+        );
+
+        const BillingIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+            </svg>
+        );
+
+        const AddIcon = () => (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+        );
+
+        const TrendUpIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#2E7D32">
+                <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+            </svg>
+        );
+
+        const TrendDownIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#E50000">
+                <path d="M16 18l2.29-2.29-4.88-4.88-4 4L2 7.41 3.41 6l6 6 4-4 6.3 6.29L22 12v6z"/>
+            </svg>
+        );
+
+        // ==========================================
+        // KIPU LOGO
+        // ==========================================
+        const KipuLogo = ({ product = 'EMR' }) => (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <svg width="54" height="25" viewBox="0 0 54 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M20.7725 5.75401H17.7322V19.8215H20.7721L20.7725 5.75401ZM19.2662 0.00110169C19.02 -0.00758244 18.7747 0.0351481 18.5455 0.126636C18.3163 0.218123 18.1081 0.356411 17.9339 0.532898C17.7597 0.709385 17.6233 0.920297 17.533 1.15252C17.4427 1.38473 17.4005 1.63329 17.409 1.88273C17.409 2.3816 17.6047 2.86004 17.9528 3.2128C18.301 3.56556 18.7732 3.76373 19.2656 3.76373C19.758 3.76373 20.2302 3.56556 20.5784 3.2128C20.9266 2.86004 21.1222 2.3816 21.1222 1.88273C21.1309 1.63337 21.0888 1.38487 20.9986 1.15268C20.9084 0.920491 20.7721 0.70959 20.598 0.533096C20.4239 0.356602 20.2158 0.218291 19.9867 0.126768C19.7576 0.0352457 19.5124 -0.00753027 19.2662 0.00110169ZM0 0.358767V19.8215H3.17592V11.0164H3.44389L12.0275 19.8215H16.3861L6.70029 9.81525L15.8489 0.358767H11.9205L3.44389 9.05327H3.17592V0.358767H0ZM34.4456 12.7871C34.4456 9.6257 32.6701 7.9353 30.194 7.9353C27.7179 7.9353 25.9416 9.6526 25.9416 12.7871C25.9416 15.9216 27.7171 17.6402 30.1932 17.6402C32.6693 17.6402 34.4456 15.9233 34.4456 12.7871ZM22.9549 24.9998V5.75401H25.7267L25.996 7.77139H26.2639C27.3935 6.10915 28.9815 5.37238 31.0805 5.37238C34.6335 5.37238 37.539 7.87982 37.539 12.7879C37.539 17.6961 34.6352 20.2035 31.0805 20.2035C29.0093 20.2035 27.4217 19.4945 26.2639 17.8591H25.996V25.0011H22.9549V24.9998ZM39.4235 5.75401V13.631C39.4235 18.266 42.0319 20.2014 46.3096 20.2014C50.5873 20.2014 53.1958 18.1298 53.1958 13.4961V5.75274H50.1547V13.4961C50.1547 16.2499 48.7289 17.5578 46.3072 17.5578C43.8854 17.5578 42.4596 16.3314 42.4596 13.6327V5.75401H39.4235Z" fill="white"/>
+                </svg>
+                <span style={{
+                    fontFamily: "'Roboto', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '24px',
+                    color: colors.white,
+                    lineHeight: '100%',
+                }}>
+                    {product}
+                </span>
+            </div>
+        );
+
+        // ==========================================
+        // HEADER COMPONENTS
+        // ==========================================
+        const BentoButton = ({ onClick, isOpen = false }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            return (
+                <button
+                    onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={{
+                        width: '32px',
+                        height: '32px',
+                        background: isHovered || isOpen ? colors.purple700 : colors.purple500,
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '4px',
+                        transition: 'background 0.15s ease',
+                    }}
+                >
+                    <AppsIcon />
+                </button>
+            );
+        };
+
+        const HeaderIconButton = ({ icon, onClick, hasAlert = false }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            return (
+                <button
+                    onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={{
+                        position: 'relative',
+                        width: '36px',
+                        height: '36px',
+                        background: isHovered ? colors.purple700 : colors.purple500,
+                        border: 'none',
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: 0,
+                        transition: 'background 0.15s ease',
+                    }}
+                >
+                    {icon}
+                    {hasAlert && (
+                        <div style={{
+                            position: 'absolute',
+                            top: '0px',
+                            right: '0px',
+                            width: '10px',
+                            height: '10px',
+                            background: colors.red500,
+                            borderRadius: '50%',
+                            border: `2px solid ${colors.purple500}`,
+                        }} />
+                    )}
+                </button>
+            );
+        };
+
+        const FacilitySelector = ({ facilityName, timeZone, onClick }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            return (
+                <button
+                    onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        maxWidth: '380px',
+                        padding: '8px 12px',
+                        background: isHovered ? colors.purple700 : colors.purple500,
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        transition: 'background 0.15s ease',
+                    }}
+                >
+                    <span style={{
+                        flex: 1,
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 500,
+                        fontSize: '16px',
+                        lineHeight: '20px',
+                        color: colors.white,
+                        textAlign: 'left',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                    }}>
+                        {facilityName}
+                    </span>
+                    <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.3)' }} />
+                    <span style={{
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 500,
+                        fontSize: '16px',
+                        lineHeight: '20px',
+                        color: colors.white,
+                        whiteSpace: 'nowrap',
+                    }}>
+                        {timeZone}
+                    </span>
+                    <ChevronDownIcon />
+                </button>
+            );
+        };
+
+        const Avatar = ({ initials, size = 44 }) => (
+            <div style={{ position: 'relative', width: `${size}px`, height: `${size}px` }}>
+                <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: '50%',
+                    background: `linear-gradient(135deg, ${colors.purple500} 0%, ${colors.purple700} 100%)`,
+                    border: `2px solid rgba(255,255,255,0.3)`,
+                }} />
+                <div style={{
+                    position: 'absolute',
+                    top: '4px',
+                    left: '4px',
+                    width: `${size - 8}px`,
+                    height: `${size - 8}px`,
+                    borderRadius: '50%',
+                    background: colors.purple700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+                    <span style={{
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 400,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: colors.white,
+                    }}>
+                        {initials}
+                    </span>
+                </div>
+            </div>
+        );
+
+        const CompanyLogo = ({ companyName }) => (
+            <div style={{
+                width: '100px',
+                height: '50px',
+                background: colors.white,
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '5px 10px',
+            }}>
+                <span style={{
+                    fontFamily: "'Roboto', sans-serif",
+                    fontWeight: 500,
+                    fontSize: '12px',
+                    color: colors.purple500,
+                    textAlign: 'center',
+                }}>
+                    {companyName}
+                </span>
+            </div>
+        );
+
+        // ==========================================
+        // GLOBAL HEADER
+        // ==========================================
+        const GlobalHeader = ({ product, facilityName, timeZone, companyName, userInitials, hasNotifications, hasMessages }) => (
+            <header style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%',
+                height: '70px',
+                background: colors.purple500,
+                padding: '0 14px',
+                boxSizing: 'border-box',
+                zIndex: 1000,
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <BentoButton onClick={() => {}} />
+                    <KipuLogo product={product} />
+                    <div style={{ marginLeft: '20px' }}>
+                        <FacilitySelector facilityName={facilityName} timeZone={timeZone} onClick={() => {}} />
+                    </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '18px', marginLeft: 'auto' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+                        <HeaderIconButton icon={<SearchIcon />} onClick={() => {}} />
+                        <HeaderIconButton icon={<AIIcon />} onClick={() => {}} />
+                        <HeaderIconButton icon={<IncomingIcon />} onClick={() => {}} />
+                        <HeaderIconButton icon={<NotificationsIcon />} onClick={() => {}} hasAlert={hasNotifications} />
+                        <HeaderIconButton icon={<DownloadIcon />} onClick={() => {}} />
+                        <HeaderIconButton icon={<EmailIcon />} onClick={() => {}} hasAlert={hasMessages} />
+                    </div>
+                    <CompanyLogo companyName={companyName} />
+                    <Avatar initials={userInitials} />
+                </div>
+            </header>
+        );
+
+        // ==========================================
+        // SIDEBAR NAVIGATION (Figma: In-Product Left-Side-Bar Nav)
+        // Matches Figma node 8840-6155 exactly
+        // ==========================================
+        
+        // Sidebar Icons from Figma (matching exact design)
+        const HomeOutlinedIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 5.69L17 10.19V18H15V12H9V18H7V10.19L12 5.69ZM12 3L2 12H5V20H11V14H13V20H19V12H22L12 3Z"/>
+            </svg>
+        );
+
+        const DashboardCustomizeIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 3H11V11H3V3ZM3 13H11V21H3V13ZM13 3H21V11H13V3ZM13 13H17V17H13V13ZM19 13H21V15H19V13ZM13 19H15V21H13V19ZM17 19H21V21H17V19ZM19 15H21V19H19V15ZM15 15H17V19H15V15Z"/>
+            </svg>
+        );
+
+        const TimelineIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23 8C23 9.1 22.1 10 21 10C20.82 10 20.65 9.98 20.49 9.93L16.93 13.48C16.98 13.64 17 13.82 17 14C17 15.1 16.1 16 15 16C13.9 16 13 15.1 13 14C13 13.82 13.02 13.64 13.07 13.48L10.52 10.93C10.36 10.98 10.18 11 10 11C9.82 11 9.64 10.98 9.48 10.93L4.93 15.49C4.98 15.65 5 15.82 5 16C5 17.1 4.1 18 3 18C1.9 18 1 17.1 1 16C1 14.9 1.9 14 3 14C3.18 14 3.35 14.02 3.51 14.07L8.07 9.52C8.02 9.36 8 9.18 8 9C8 7.9 8.9 7 10 7C11.1 7 12 7.9 12 9C12 9.18 11.98 9.36 11.93 9.52L14.48 12.07C14.64 12.02 14.82 12 15 12C15.18 12 15.36 12.02 15.52 12.07L19.07 8.51C19.02 8.35 19 8.18 19 8C19 6.9 19.9 6 21 6C22.1 6 23 6.9 23 8Z"/>
+            </svg>
+        );
+
+        const AdminSettingsIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.14 12.94C19.18 12.63 19.2 12.31 19.2 12C19.2 11.69 19.18 11.37 19.14 11.06L21.16 9.48C21.34 9.34 21.39 9.07 21.27 8.87L19.27 5.37C19.15 5.17 18.89 5.1 18.69 5.17L16.36 6.1C15.86 5.72 15.33 5.4 14.74 5.16L14.4 2.67C14.36 2.45 14.16 2.28 13.92 2.28H9.92C9.68 2.28 9.49 2.45 9.45 2.67L9.11 5.16C8.52 5.4 7.99 5.72 7.49 6.1L5.16 5.17C4.96 5.1 4.7 5.17 4.58 5.37L2.58 8.87C2.46 9.07 2.51 9.34 2.69 9.48L4.71 11.06C4.67 11.37 4.65 11.69 4.65 12C4.65 12.31 4.67 12.63 4.71 12.94L2.69 14.52C2.51 14.66 2.46 14.93 2.58 15.13L4.58 18.63C4.7 18.83 4.96 18.9 5.16 18.83L7.49 17.9C7.99 18.28 8.52 18.6 9.11 18.84L9.45 21.33C9.49 21.55 9.68 21.72 9.92 21.72H13.92C14.16 21.72 14.36 21.55 14.4 21.33L14.74 18.84C15.33 18.6 15.86 18.28 16.36 17.9L18.69 18.83C18.89 18.9 19.15 18.83 19.27 18.63L21.27 15.13C21.39 14.93 21.34 14.66 21.16 14.52L19.14 12.94ZM11.92 15.5C10 15.5 8.42 13.92 8.42 12C8.42 10.08 10 8.5 11.92 8.5C13.84 8.5 15.42 10.08 15.42 12C15.42 13.92 13.84 15.5 11.92 15.5Z"/>
+            </svg>
+        );
+
+        const SchoolIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18ZM12 3L1 9L12 15L21 10.09V17H23V9L12 3Z"/>
+            </svg>
+        );
+
+        const ChevronDownNavIcon = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.41 8.59L12 13.17L16.59 8.59L18 10L12 16L6 10L7.41 8.59Z"/>
+            </svg>
+        );
+
+        const ChevronUpNavIcon = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.41 15.41L12 10.83L16.59 15.41L18 14L12 8L6 14L7.41 15.41Z"/>
+            </svg>
+        );
+
+        const ArrowBackIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z"/>
+            </svg>
+        );
+
+        // Navigation Child Item (for expanded accordion sections)
+        const NavChildItem = ({ label, isSelected, onClick }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            return (
+                <button
+                    onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        width: '100%',
+                        padding: '12px 16px 12px 48px',
+                        background: isSelected ? colors.blue100 : (isHovered ? colors.blue100 : 'transparent'),
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'background 0.15s ease',
+                        textAlign: 'left',
+                    }}
+                >
+                    <span style={{
+                        flex: 1,
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 400,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: isSelected ? '#2D0A54' : colors.black,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                    }}>
+                        {label}
+                    </span>
+                </button>
+            );
+        };
+
+        // Navigation Header (accordion parent)
+        const NavHeader = ({ icon, label, hasChildren, isExpanded, onClick }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            return (
+                <button
+                    onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        width: '100%',
+                        padding: '12px 8px 12px 16px',
+                        background: isHovered ? colors.blue100 : 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'background 0.15s ease',
+                        textAlign: 'left',
+                    }}
+                >
+                    <span style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        width: '24px', 
+                        height: '24px', 
+                        flexShrink: 0,
+                        color: colors.gray06,
+                    }}>
+                        {icon}
+                    </span>
+                    <span style={{
+                        flex: 1,
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: colors.black,
+                    }}>
+                        {label}
+                    </span>
+                    {hasChildren && (
+                        <span style={{ color: colors.gray06, display: 'flex' }}>
+                            {isExpanded ? <ChevronUpNavIcon /> : <ChevronDownNavIcon />}
+                        </span>
+                    )}
+                </button>
+            );
+        };
+
+        // Accordion Section
+        const AccordionSection = ({ icon, label, children, isExpanded, onToggle, selectedItem, onSelectItem }) => {
+            const hasChildren = children && children.length > 0;
+            
+            return (
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    width: '100%',
+                    borderBottom: hasChildren && isExpanded ? `1px solid ${colors.gray03}` : 'none',
+                    paddingBottom: hasChildren && isExpanded ? '14px' : '0',
+                }}>
+                    <NavHeader
+                        icon={icon}
+                        label={label}
+                        hasChildren={hasChildren}
+                        isExpanded={isExpanded}
+                        onClick={() => hasChildren ? onToggle() : onSelectItem(label.toLowerCase())}
+                    />
+                    {hasChildren && isExpanded && (
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            {children.map((child, index) => (
+                                <NavChildItem
+                                    key={index}
+                                    label={child}
+                                    isSelected={selectedItem === child}
+                                    onClick={() => onSelectItem(child)}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Main Sidebar Component (matching Figma exactly)
+        const Sidebar = ({ selectedItem, onSelectItem }) => {
+            const [expandedSections, setExpandedSections] = useState({
+                apps: true,
+                analytics: false,
+                knowledge: false,
+            });
+
+            const toggleSection = (section) => {
+                setExpandedSections(prev => ({
+                    ...prev,
+                    [section]: !prev[section]
+                }));
+            };
+
+            return (
+                <aside style={{
+                    position: 'fixed',
+                    top: '70px',
+                    left: 0,
+                    width: '264px',
+                    height: 'calc(100vh - 70px)',
+                    background: colors.white,
+                    borderRight: `1px solid ${colors.gray03}`,
+                    boxShadow: '0px 2px 20px rgba(0, 0, 0, 0.08)',
+                    paddingTop: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}>
+                    <nav style={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        flex: 1,
+                        overflowX: 'hidden',
+                        overflowY: 'auto',
+                    }}>
+                        {/* Dashboard - no children */}
+                        <AccordionSection 
+                            icon={<HomeOutlinedIcon />} 
+                            label="Dashboard"
+                            selectedItem={selectedItem}
+                            onSelectItem={onSelectItem}
+                        />
+
+                        {/* Apps - expandable with children */}
+                        <AccordionSection 
+                            icon={<DashboardCustomizeIcon />} 
+                            label="Apps"
+                            isExpanded={expandedSections.apps}
+                            onToggle={() => toggleSection('apps')}
+                            selectedItem={selectedItem}
+                            onSelectItem={onSelectItem}
+                            children={[
+                                'Pre-admission coordinator',
+                                'Admissions',
+                                'Utilization review coordinator',
+                                'Clinical documentation',
+                                'Director of compliance',
+                            ]}
+                        />
+
+                        {/* Analytics - expandable with children */}
+                        <AccordionSection 
+                            icon={<TimelineIcon />} 
+                            label="Analytics"
+                            isExpanded={expandedSections.analytics}
+                            onToggle={() => toggleSection('analytics')}
+                            selectedItem={selectedItem}
+                            onSelectItem={onSelectItem}
+                            children={[
+                                'Reports',
+                                'Dashboards',
+                                'Metrics',
+                            ]}
+                        />
+
+                        {/* Admin - no children */}
+                        <AccordionSection 
+                            icon={<AdminSettingsIcon />} 
+                            label="Admin"
+                            selectedItem={selectedItem}
+                            onSelectItem={onSelectItem}
+                        />
+
+                        {/* Knowledge - expandable with children */}
+                        <AccordionSection 
+                            icon={<SchoolIcon />} 
+                            label="Knowledge"
+                            isExpanded={expandedSections.knowledge}
+                            onToggle={() => toggleSection('knowledge')}
+                            selectedItem={selectedItem}
+                            onSelectItem={onSelectItem}
+                            children={[
+                                'Documentation',
+                                'Training',
+                                'FAQs',
+                            ]}
+                        />
+                    </nav>
+                    
+                    {/* Collapse button at bottom */}
+                    <div style={{ 
+                        borderTop: `1px solid ${colors.gray03}`, 
+                        padding: '8px 16px',
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        height: '40px',
+                        flexShrink: 0,
+                    }}>
+                        <button style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: 0,
+                            color: colors.gray06,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '24px',
+                            height: '24px',
+                        }}>
+                            <ArrowBackIcon />
+                        </button>
+                    </div>
+                </aside>
+            );
+        };
+
+        // ==========================================
+        // BUTTON COMPONENT (Small Button - Kipu Design System)
+        // ==========================================
+        const Button = ({ children, variant = 'filled', onClick, disabled = false, icon }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            
+            const baseStyles = {
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: 500,
+                fontFamily: "'Roboto', sans-serif",
+                borderRadius: '100px',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                minHeight: '38px',
+                textTransform: 'uppercase',
+                letterSpacing: '0',
+                lineHeight: '100%',
+                border: 'none',
+                outline: 'none',
+                opacity: disabled ? 0.6 : 1,
+            };
+            
+            const getVariantStyles = () => {
+                if (variant === 'filled') {
+                    return {
+                        background: disabled ? colors.gray04 : (isHovered ? colors.blue600 : colors.blue500),
+                        color: colors.white,
+                        boxShadow: disabled ? 'none' : (isHovered ? '0px 2px 12px rgba(0, 0, 0, 0.2)' : '0px 2px 12px rgba(0, 0, 0, 0.12)'),
+                    };
+                }
+                if (variant === 'outlined') {
+                    return {
+                        background: isHovered && !disabled ? colors.blue100 : 'transparent',
+                        color: disabled ? colors.gray04 : (isHovered ? colors.blue600 : colors.blue500),
+                        border: `2px solid ${disabled ? colors.gray04 : (isHovered ? colors.blue600 : colors.blue500)}`,
+                        boxShadow: isHovered && !disabled ? '0px 1px 8px rgba(0, 0, 0, 0.14)' : 'none',
+                    };
+                }
+                if (variant === 'text') {
+                    return {
+                        background: isHovered && !disabled ? colors.blue100 : 'transparent',
+                        color: disabled ? colors.gray04 : (isHovered ? colors.blue600 : colors.blue500),
+                        boxShadow: 'none',
+                    };
+                }
+                return {};
+            };
+            
+            return (
+                <button 
+                    style={{ ...baseStyles, ...getVariantStyles() }} 
+                    onClick={onClick}
+                    disabled={disabled}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    {icon && <span style={{ display: 'flex', width: '18px', height: '18px' }}>{icon}</span>}
+                    {children}
+                </button>
+            );
+        };
+
+        // ==========================================
+        // STATUS BADGE
+        // ==========================================
+        const StatusBadge = ({ status, label }) => {
+            const statusColors = {
+                active: { bg: '#CADFFE', text: colors.black },
+                admitted: { bg: '#B8E7BA', text: colors.black },
+                pending: { bg: '#CADFFE', text: colors.black },
+                discharged: { bg: colors.gray04, text: colors.black },
+                urgent: { bg: '#F29278', text: colors.black },
+            };
+            const { bg, text } = statusColors[status?.toLowerCase()] || statusColors.active;
+            return (
+                <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '4px 20px',
+                    borderRadius: '4px',
+                    fontFamily: "'Roboto', sans-serif",
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    background: bg,
+                    color: text,
+                    textTransform: 'capitalize',
+                }}>
+                    {label || status}
+                </span>
+            );
+        };
+
+        // ==========================================
+        // CARD COMPONENT
+        // ==========================================
+        const Card = ({ children, padding = 'medium' }) => {
+            const paddings = { small: '12px', medium: '20px', large: '24px' };
+            return (
+                <div style={{
+                    background: colors.white,
+                    borderRadius: '12px',
+                    padding: paddings[padding],
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                }}>
+                    {children}
+                </div>
+            );
+        };
+
+        // ==========================================
+        // STAT CARD
+        // ==========================================
+        const StatCard = ({ title, value, change, changeType, icon }) => (
+            <Card>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                        <p style={{
+                            fontFamily: "'Roboto', sans-serif",
+                            fontSize: '14px',
+                            color: colors.gray06,
+                            marginBottom: '8px',
+                        }}>
+                            {title}
+                        </p>
+                        <p style={{
+                            fontFamily: "'Roboto', sans-serif",
+                            fontSize: '32px',
+                            fontWeight: 500,
+                            color: colors.black,
+                            marginBottom: '8px',
+                        }}>
+                            {value}
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            {changeType === 'up' ? <TrendUpIcon /> : <TrendDownIcon />}
+                            <span style={{
+                                fontFamily: "'Roboto', sans-serif",
+                                fontSize: '14px',
+                                color: changeType === 'up' ? colors.green500 : colors.red500,
+                            }}>
+                                {change}
+                            </span>
+                            <span style={{ fontSize: '14px', color: colors.gray05 }}>vs last week</span>
+                        </div>
+                    </div>
+                    <div style={{
+                        width: '48px',
+                        height: '48px',
+                        background: colors.purple100,
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: colors.purple700,
+                    }}>
+                        {icon}
+                    </div>
+                </div>
+            </Card>
+        );
+
+        // ==========================================
+        // TABLE COMPONENTS
+        // ==========================================
+        const tableColors = {
+            hoverBg: '#F7F2FF',
+            rowDivider: '#EFE5FE',
+            headerBg: colors.white,
+            headerText: colors.black,
+            cellText: colors.black,
+        };
+
+        const Table = ({ children }) => (
+            <div style={{ overflowX: 'auto' }}>
+                <table style={{ 
+                    width: '100%', 
+                    borderCollapse: 'collapse',
+                    fontFamily: "'Roboto', sans-serif",
+                    fontSize: '14px',
+                }}>
+                    {children}
+                </table>
+            </div>
+        );
+
+        const TableHead = ({ children }) => (
+            <thead style={{ background: tableColors.headerBg }}>{children}</thead>
+        );
+
+        const TableBody = ({ children }) => <tbody>{children}</tbody>;
+
+        const TableRow = ({ children, onClick }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            return (
+                <tr 
+                    style={{
+                        background: isHovered ? tableColors.hoverBg : 'transparent',
+                        cursor: onClick ? 'pointer' : 'default',
+                        transition: 'background 0.15s ease',
+                        height: '48px',
+                    }}
+                    onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    {children}
+                </tr>
+            );
+        };
+
+        const TableHeader = ({ children, align = 'left' }) => (
+            <th style={{
+                padding: '14px 16px',
+                textAlign: align,
+                fontWeight: 500,
+                fontSize: '14px',
+                color: tableColors.headerText,
+                borderBottom: `1px solid ${tableColors.rowDivider}`,
+            }}>
+                {children}
+            </th>
+        );
+
+        const TableCell = ({ children, align = 'left' }) => (
+            <td style={{
+                padding: '14px 16px',
+                textAlign: align,
+                fontSize: '14px',
+                borderBottom: `1px solid ${tableColors.rowDivider}`,
+                color: tableColors.cellText,
+            }}>
+                {children}
+            </td>
+        );
+
+        // ==========================================
+        // SEARCH INPUT (Figma: Flat Search)
+        // Focus state: 2px solid #1565C0 (Blue 500), shadow 0px 2px 4px rgba(0,0,0,0.16)
+        // ==========================================
+        const SearchInput = ({ placeholder, value, onChange }) => {
+            const [isFocused, setIsFocused] = useState(false);
+            
+            return (
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px 8px 24px',
+                    height: '40px',
+                    background: colors.white,
+                    border: isFocused ? `2px solid ${colors.blue500}` : `1px solid ${colors.gray04}`,
+                    borderRadius: '120px',
+                    minWidth: '280px',
+                    boxShadow: isFocused ? '0px 2px 4px rgba(0, 0, 0, 0.16)' : 'none',
+                    transition: 'all 0.15s ease',
+                }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill={isFocused ? colors.purple500 : colors.gray05}>
+                        <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14Z"/>
+                    </svg>
+                    <input
+                        type="text"
+                        placeholder={placeholder}
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        style={{
+                            flex: 1,
+                            border: 'none',
+                            outline: 'none',
+                            fontFamily: "'Roboto', sans-serif",
+                            fontSize: '14px',
+                            lineHeight: '20px',
+                            color: colors.black,
+                            background: 'transparent',
+                        }}
+                    />
+                    {value && (
+                        <button
+                            onClick={() => onChange('')}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill={colors.gray05}>
+                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                            </svg>
+                        </button>
+                    )}
+                </div>
+            );
+        };
+
+        // ==========================================
+        // MAIN DASHBOARD APP
+        // ==========================================
+        const App = () => {
+            const [activeNav, setActiveNav] = useState('Pre-admission coordinator');
+            const [searchQuery, setSearchQuery] = useState('');
+
+            const recentPatients = [
+                { id: 1, name: 'John Smith', mrn: 'MTY45678', status: 'admitted', admitDate: 'Mar 15, 2026' },
+                { id: 2, name: 'Sarah Johnson', mrn: 'MTY45679', status: 'active', admitDate: 'Mar 14, 2026' },
+                { id: 3, name: 'Michael Brown', mrn: 'MTY45680', status: 'pending', admitDate: 'Mar 13, 2026' },
+                { id: 4, name: 'Emily Davis', mrn: 'MTY45681', status: 'discharged', admitDate: 'Mar 10, 2026' },
+                { id: 5, name: 'Robert Wilson', mrn: 'MTY45682', status: 'urgent', admitDate: 'Mar 12, 2026' },
+            ];
+
+            const upcomingAppointments = [
+                { id: 1, time: '9:00 AM', patient: 'John Smith', type: 'Therapy Session', provider: 'Dr. Williams' },
+                { id: 2, time: '10:30 AM', patient: 'Sarah Johnson', type: 'Med Review', provider: 'Dr. Martinez' },
+                { id: 3, time: '1:00 PM', patient: 'Michael Brown', type: 'Group Therapy', provider: 'Dr. Anderson' },
+                { id: 4, time: '2:30 PM', patient: 'Emily Davis', type: 'Discharge Planning', provider: 'Dr. Thompson' },
+            ];
+
+            return (
+                <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+                    <GlobalHeader 
+                        product="EMR"
+                        facilityName="West Palm Beach Treatment"
+                        timeZone="11:42 AM EDT"
+                        companyName="Canyon Vista"
+                        userInitials="EF"
+                        hasNotifications={true}
+                        hasMessages={false}
+                    />
+                    
+                    <Sidebar selectedItem={activeNav} onSelectItem={setActiveNav} />
+                    
+                    <main style={{
+                        marginTop: '70px',
+                        marginLeft: '264px',
+                        padding: '24px',
+                        minHeight: 'calc(100vh - 70px)',
+                        background: '#F5F5F5',
+                    }}>
+                        {/* Page Header */}
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '24px',
+                        }}>
+                            <div>
+                                <h1 style={{
+                                    fontFamily: "'Roboto', sans-serif",
+                                    fontSize: '28px',
+                                    fontWeight: 500,
+                                    color: colors.black,
+                                    marginBottom: '4px',
+                                }}>
+                                    Dashboard
+                                </h1>
+                                <p style={{
+                                    fontFamily: "'Roboto', sans-serif",
+                                    fontSize: '14px',
+                                    color: colors.gray06,
+                                }}>
+                                    Welcome back, Eduardo. Here's what's happening today.
+                                </p>
+                            </div>
+                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                <SearchInput 
+                                    placeholder="Search patients..." 
+                                    value={searchQuery}
+                                    onChange={setSearchQuery}
+                                />
+                                <Button variant="filled" icon={<AddIcon />}>
+                                    New Patient
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Stats Grid */}
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(4, 1fr)',
+                            gap: '24px',
+                            marginBottom: '24px',
+                        }}>
+                            <StatCard 
+                                title="Total Patients"
+                                value="248"
+                                change="+12%"
+                                changeType="up"
+                                icon={<PatientsIcon />}
+                            />
+                            <StatCard 
+                                title="Admissions Today"
+                                value="8"
+                                change="+3"
+                                changeType="up"
+                                icon={<CalendarIcon />}
+                            />
+                            <StatCard 
+                                title="Discharges Today"
+                                value="5"
+                                change="-2"
+                                changeType="down"
+                                icon={<ReportsIcon />}
+                            />
+                            <StatCard 
+                                title="Average LOS"
+                                value="32"
+                                change="+4%"
+                                changeType="up"
+                                icon={<DashboardIcon />}
+                            />
+                        </div>
+
+                        {/* Content Grid */}
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: '2fr 1fr',
+                            gap: '24px',
+                        }}>
+                            {/* Recent Patients Table */}
+                            <Card>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    marginBottom: '16px',
+                                }}>
+                                    <h2 style={{
+                                        fontFamily: "'Roboto', sans-serif",
+                                        fontSize: '18px',
+                                        fontWeight: 500,
+                                        color: colors.black,
+                                    }}>
+                                        Recent Patients
+                                    </h2>
+                                    <Button variant="text">View All</Button>
+                                </div>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableHeader>Patient Name</TableHeader>
+                                            <TableHeader>MRN</TableHeader>
+                                            <TableHeader>Status</TableHeader>
+                                            <TableHeader>Admit Date</TableHeader>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {recentPatients.map(patient => (
+                                            <TableRow key={patient.id} onClick={() => alert(`View ${patient.name}`)}>
+                                                <TableCell>{patient.name}</TableCell>
+                                                <TableCell>{patient.mrn}</TableCell>
+                                                <TableCell>
+                                                    <StatusBadge status={patient.status} />
+                                                </TableCell>
+                                                <TableCell>{patient.admitDate}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </Card>
+
+                            {/* Upcoming Appointments */}
+                            <Card>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    marginBottom: '16px',
+                                }}>
+                                    <h2 style={{
+                                        fontFamily: "'Roboto', sans-serif",
+                                        fontSize: '18px',
+                                        fontWeight: 500,
+                                        color: colors.black,
+                                    }}>
+                                        Today's Schedule
+                                    </h2>
+                                    <Button variant="text">View All</Button>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    {upcomingAppointments.map(appt => (
+                                        <div 
+                                            key={appt.id}
+                                            style={{
+                                                display: 'flex',
+                                                gap: '12px',
+                                                padding: '12px',
+                                                background: colors.gray02,
+                                                borderRadius: '8px',
+                                                cursor: 'pointer',
+                                                transition: 'background 0.15s ease',
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.background = colors.purple50}
+                                            onMouseLeave={(e) => e.currentTarget.style.background = colors.gray02}
+                                        >
+                                            <div style={{
+                                                width: '60px',
+                                                flexShrink: 0,
+                                                fontFamily: "'Roboto', sans-serif",
+                                                fontSize: '14px',
+                                                fontWeight: 500,
+                                                color: colors.purple700,
+                                            }}>
+                                                {appt.time}
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <p style={{
+                                                    fontFamily: "'Roboto', sans-serif",
+                                                    fontSize: '14px',
+                                                    fontWeight: 500,
+                                                    color: colors.black,
+                                                    marginBottom: '2px',
+                                                }}>
+                                                    {appt.patient}
+                                                </p>
+                                                <p style={{
+                                                    fontFamily: "'Roboto', sans-serif",
+                                                    fontSize: '12px',
+                                                    color: colors.gray06,
+                                                }}>
+                                                    {appt.type} • {appt.provider}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </Card>
+                        </div>
+
+                        {/* Quick Actions */}
+                        <div style={{ marginTop: '24px' }}>
+                            <Card>
+                                <h2 style={{
+                                    fontFamily: "'Roboto', sans-serif",
+                                    fontSize: '18px',
+                                    fontWeight: 500,
+                                    color: colors.black,
+                                    marginBottom: '16px',
+                                }}>
+                                    Quick Actions
+                                </h2>
+                                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                                    <Button variant="outlined">New Admission</Button>
+                                    <Button variant="outlined">Schedule Appointment</Button>
+                                    <Button variant="outlined">Create Note</Button>
+                                    <Button variant="outlined">Run Report</Button>
+                                    <Button variant="outlined">Send Message</Button>
+                                </div>
+                            </Card>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

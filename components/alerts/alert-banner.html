@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alert Banner - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Alert Banner Component - Kipu Design System
+        // Figma specs: 4px border-radius, 16px padding, 12px gap, no border
+        const AlertBanner = ({ 
+            children,
+            title,
+            severity = 'info',
+            icon,
+            action,
+            onClose,
+            closable = false,
+        }) => {
+            const [isVisible, setIsVisible] = useState(true);
+
+            if (!isVisible) return null;
+
+            // Kipu Design System colors from Figma
+            const severityColors = {
+                info: { 
+                    bg: '#EFF5FF',  // Light Blue 100
+                    icon: '#1565C0', // Blue 500
+                },
+                success: { 
+                    bg: '#E8F5E9',  // Green 50
+                    icon: '#2E7D32', // Green 700
+                },
+                warning: { 
+                    bg: '#FDFAE6',  // Yellow 50
+                    icon: '#D0872E', // Orange 600
+                },
+                error: { 
+                    bg: '#FDEFEB',  // Red 50
+                    icon: '#E50000', // Alert Red
+                },
+            };
+
+            const colors = severityColors[severity];
+
+            // Figma: no border, 4px border-radius, 16px padding, 12px gap, items centered
+            const containerStyles = {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '16px',
+                borderRadius: '4px',
+                background: colors.bg,
+                fontFamily: "'Roboto', sans-serif",
+            };
+
+            const iconStyles = {
+                flexShrink: 0,
+                width: '24px',
+                height: '24px',
+                color: colors.icon,
+            };
+
+            const contentStyles = {
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+                minWidth: 0,
+            };
+
+            // Figma: Roboto Medium, 16px, line-height 20px, black text
+            const titleStyles = {
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 500,
+                fontSize: '16px',
+                lineHeight: '20px',
+                color: '#000000',
+                margin: 0,
+            };
+
+            // Figma: Roboto Regular, 14px, line-height 20px, black text
+            const messageStyles = {
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400,
+                fontSize: '14px',
+                lineHeight: '20px',
+                color: '#000000',
+                margin: 0,
+            };
+
+            const closeButtonStyles = {
+                flexShrink: 0,
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#5F6368',
+                padding: 0,
+            };
+
+            // Kipu Design System icons
+            const defaultIcons = {
+                info: (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill={colors.icon} style={{ flexShrink: 0 }}>
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                ),
+                success: (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill={colors.icon} style={{ flexShrink: 0 }}>
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                ),
+                warning: (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill={colors.icon} style={{ flexShrink: 0 }}>
+                        <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+                    </svg>
+                ),
+                error: (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill={colors.icon} style={{ flexShrink: 0 }}>
+                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                    </svg>
+                ),
+            };
+
+            const handleClose = () => {
+                setIsVisible(false);
+                onClose?.();
+            };
+
+            return (
+                <div style={containerStyles}>
+                    {icon || defaultIcons[severity]}
+                    <div style={contentStyles}>
+                        {title && <p style={titleStyles}>{title}</p>}
+                        {children && <p style={messageStyles}>{children}</p>}
+                        {action && <div style={{ marginTop: '8px' }}>{action}</div>}
+                    </div>
+                    {closable && (
+                        <button style={closeButtonStyles} onClick={handleClose}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                            </svg>
+                        </button>
+                    )}
+                </div>
+            );
+        };
+
+        // Demo App
+        const App = () => {
+            const [showClosable, setShowClosable] = useState(true);
+
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Alerts</span>
+                            <span>/</span>
+                            <span>Alert Banner</span>
+                        </div>
+                        <h1>Alert Banner</h1>
+                        <p className="description">
+                            Persistent system messages highlighting errors, warnings, or concerns that require 
+                            attention and additional detail. Alert banners use colored backgrounds without borders.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>Severity Levels</h2>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <AlertBanner severity="info" title="Information">
+                                This is an informational alert — check it out!
+                            </AlertBanner>
+                            <AlertBanner severity="success" title="Success">
+                                This is a success alert — well done!
+                            </AlertBanner>
+                            <AlertBanner severity="warning" title="Warning">
+                                This is a warning alert — be careful!
+                            </AlertBanner>
+                            <AlertBanner severity="error" title="Error">
+                                This is an error alert — something went wrong!
+                            </AlertBanner>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Message Only (No Title)</h2>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <AlertBanner severity="info">
+                                This patient is enrolled in a high-risk monitoring program.
+                            </AlertBanner>
+                            <AlertBanner severity="warning">
+                                Offline mode enabled. Changes will sync when reconnected.
+                            </AlertBanner>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>With Title and Description</h2>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <AlertBanner severity="error" title="Invalid password.">
+                                If you've forgotten your password, click "Forgot Password" below. For further help, contact your facility's Super Administrator.
+                            </AlertBanner>
+                            <AlertBanner severity="error" title="Allergy conflict detected">
+                                There are one or more allergy conflicts. Review before ordering medication.
+                            </AlertBanner>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Closable Alert</h2>
+                        {showClosable ? (
+                            <AlertBanner 
+                                severity="info" 
+                                title="Dismissible Alert"
+                                closable
+                                onClose={() => setShowClosable(false)}
+                            >
+                                Click the close button to dismiss this alert.
+                            </AlertBanner>
+                        ) : (
+                            <div style={{ padding: '16px', background: '#f1f5f9', borderRadius: '8px', textAlign: 'center' }}>
+                                Alert was dismissed.
+                                <button 
+                                    onClick={() => setShowClosable(true)}
+                                    style={{ marginLeft: '12px', color: '#1565C0', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                                >
+                                    Show again
+                                </button>
+                            </div>
+                        )}
+                    </section>
+
+                    <section className="component-section">
+                        <h2>With Action</h2>
+                        <AlertBanner 
+                            severity="warning" 
+                            title="Your session is about to expire"
+                            action={
+                                <button style={{ 
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                    padding: '10px 20px', 
+                                    background: '#1565C0', 
+                                    color: 'white', 
+                                    border: 'none', 
+                                    borderRadius: '100px',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                    fontFamily: "'Roboto', sans-serif",
+                                    fontWeight: 500,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0',
+                                    lineHeight: '100%',
+                                    boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.12)',
+                                    minHeight: '38px',
+                                    outline: 'none',
+                                }}>
+                                    Extend Session
+                                </button>
+                            }
+                        >
+                            You will be logged out in 5 minutes due to inactivity.
+                        </AlertBanner>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Design Specifications</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Border Radius</td>
+                                    <td><code>4px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Padding</td>
+                                    <td><code>16px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Gap</td>
+                                    <td><code>12px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Icon Size</td>
+                                    <td><code>24×24px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Title Font</td>
+                                    <td><code>Roboto Medium, 16px, line-height 20px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Body Font</td>
+                                    <td><code>Roboto Regular, 14px, line-height 20px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Text Color</td>
+                                    <td><code>#000000</code> (Black)</td>
+                                </tr>
+                                <tr>
+                                    <td>Info Background</td>
+                                    <td><code>#EFF5FF</code> (Light Blue 100)</td>
+                                </tr>
+                                <tr>
+                                    <td>Error Background</td>
+                                    <td><code>#FDEFEB</code> (Red 50)</td>
+                                </tr>
+                                <tr>
+                                    <td>Warning Background</td>
+                                    <td><code>#FDFAE6</code> (Yellow 50)</td>
+                                </tr>
+                                <tr>
+                                    <td>Success Background</td>
+                                    <td><code>#E8F5E9</code> (Green 50)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>severity</code></td>
+                                    <td><code>'info' | 'success' | 'warning' | 'error'</code></td>
+                                    <td><code>'info'</code></td>
+                                    <td>Type of alert - determines background and icon color</td>
+                                </tr>
+                                <tr>
+                                    <td><code>title</code></td>
+                                    <td><code>string</code></td>
+                                    <td>-</td>
+                                    <td>Alert title (Roboto Medium, 16px)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>children</code></td>
+                                    <td><code>ReactNode</code></td>
+                                    <td>-</td>
+                                    <td>Alert message body (Roboto Regular, 14px)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>closable</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Show close button</td>
+                                </tr>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td><code>ReactNode</code></td>
+                                    <td>-</td>
+                                    <td>Action button/element</td>
+                                </tr>
+                                <tr>
+                                    <td><code>onClose</code></td>
+                                    <td><code>function</code></td>
+                                    <td>-</td>
+                                    <td>Called when alert is closed</td>
+                                </tr>
+                                <tr>
+                                    <td><code>icon</code></td>
+                                    <td><code>ReactNode</code></td>
+                                    <td>-</td>
+                                    <td>Custom icon (overrides default)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { AlertBanner } from '@kipu/design-system';
+
+// Message only (no title)
+<AlertBanner severity="info">
+  This patient is enrolled in a high-risk monitoring program.
+</AlertBanner>
+
+// With title and description
+<AlertBanner severity="error" title="Invalid password.">
+  If you've forgotten your password, click "Forgot Password" below.
+</AlertBanner>
+
+// Closable alert
+<AlertBanner 
+  severity="warning" 
+  title="Session expiring"
+  closable
+  onClose={() => console.log('closed')}
+>
+  You will be logged out in 5 minutes.
+</AlertBanner>
+
+// With action button
+<AlertBanner 
+  severity="warning" 
+  title="Offline mode"
+  action={<Button>Reconnect</Button>}
+>
+  Changes will sync when reconnected.
+</AlertBanner>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

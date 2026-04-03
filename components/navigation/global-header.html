@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kipu Global Header - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Kipu Design System Colors (from Figma)
+        const colors = {
+            purple500: '#6C18C9',
+            purple700: '#4D118F',
+            white: '#FFFFFF',
+            gray02: '#F0F0F0',
+            gray05: '#999999',
+            gray06: '#666666',
+            black: '#000000',
+        };
+
+        // Header Icons - White icons for purple background buttons
+        // Figma specs: 24×24px icons, white fill on purple background
+        const AppsIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/>
+            </svg>
+        );
+
+        // Search Icon (magnifying glass)
+        const SearchIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14Z"/>
+            </svg>
+        );
+
+        // AI Sparkle Icon
+        const AIIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M19 9L20.25 6.25L23 5L20.25 3.75L19 1L17.75 3.75L15 5L17.75 6.25L19 9ZM11.5 9.5L9 4L6.5 9.5L1 12L6.5 14.5L9 20L11.5 14.5L17 12L11.5 9.5ZM19 15L17.75 17.75L15 19L17.75 20.25L19 23L20.25 20.25L23 19L20.25 17.75L19 15Z"/>
+            </svg>
+        );
+
+        // Incoming/Contact Page Icon (document with person)
+        const IncomingIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM12 10C13.1 10 14 10.9 14 12C14 13.1 13.1 14 12 14C10.9 14 10 13.1 10 12C10 10.9 10.9 10 12 10ZM16 18H8V17C8 15.67 10.67 15 12 15C13.33 15 16 15.67 16 17V18ZM13 9V3.5L18.5 9H13Z"/>
+            </svg>
+        );
+
+        // Notifications/Bell Icon
+        const NotificationsIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16ZM16 17H8V11C8 8.52 9.51 6.5 12 6.5C14.49 6.5 16 8.52 16 11V17Z"/>
+            </svg>
+        );
+
+        // Download Icon
+        const DownloadIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M19 9H15V3H9V9H5L12 16L19 9ZM5 18V20H19V18H5Z"/>
+            </svg>
+        );
+
+        // Email/Messages Icon
+        const EmailIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z"/>
+            </svg>
+        );
+
+        const ChevronDownIcon = ({ color = 'white' }) => (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill={color}>
+                <path d="M7 10l5 5 5-5H7z"/>
+            </svg>
+        );
+
+        // Kipu Logo Component - Using actual Kipu logo SVG
+        const KipuLogo = ({ product = 'EMR' }) => (
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+            }}>
+                <svg width="54" height="25" viewBox="0 0 54 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M20.7725 5.75401H17.7322V19.8215H20.7721L20.7725 5.75401ZM19.2662 0.00110169C19.02 -0.00758244 18.7747 0.0351481 18.5455 0.126636C18.3163 0.218123 18.1081 0.356411 17.9339 0.532898C17.7597 0.709385 17.6233 0.920297 17.533 1.15252C17.4427 1.38473 17.4005 1.63329 17.409 1.88273C17.409 2.3816 17.6047 2.86004 17.9528 3.2128C18.301 3.56556 18.7732 3.76373 19.2656 3.76373C19.758 3.76373 20.2302 3.56556 20.5784 3.2128C20.9266 2.86004 21.1222 2.3816 21.1222 1.88273C21.1309 1.63337 21.0888 1.38487 20.9986 1.15268C20.9084 0.920491 20.7721 0.70959 20.598 0.533096C20.4239 0.356602 20.2158 0.218291 19.9867 0.126768C19.7576 0.0352457 19.5124 -0.00753027 19.2662 0.00110169ZM0 0.358767V19.8215H3.17592V11.0164H3.44389L12.0275 19.8215H16.3861L6.70029 9.81525L15.8489 0.358767H11.9205L3.44389 9.05327H3.17592V0.358767H0ZM34.4456 12.7871C34.4456 9.6257 32.6701 7.9353 30.194 7.9353C27.7179 7.9353 25.9416 9.6526 25.9416 12.7871C25.9416 15.9216 27.7171 17.6402 30.1932 17.6402C32.6693 17.6402 34.4456 15.9233 34.4456 12.7871ZM22.9549 24.9998V5.75401H25.7267L25.996 7.77139H26.2639C27.3935 6.10915 28.9815 5.37238 31.0805 5.37238C34.6335 5.37238 37.539 7.87982 37.539 12.7879C37.539 17.6961 34.6352 20.2035 31.0805 20.2035C29.0093 20.2035 27.4217 19.4945 26.2639 17.8591H25.996V25.0011H22.9549V24.9998ZM39.4235 5.75401V13.631C39.4235 18.266 42.0319 20.2014 46.3096 20.2014C50.5873 20.2014 53.1958 18.1298 53.1958 13.4961V5.75274H50.1547V13.4961C50.1547 16.2499 48.7289 17.5578 46.3072 17.5578C43.8854 17.5578 42.4596 16.3314 42.4596 13.6327V5.75401H39.4235Z" fill="white"/>
+                </svg>
+                <span style={{
+                    fontFamily: "'Roboto', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '24px',
+                    color: colors.white,
+                    lineHeight: '100%',
+                }}>
+                    {product}
+                </span>
+            </div>
+        );
+
+        // Bento Menu Button - App Switcher
+        // Figma specs: 32×32px, background #6C18C9, border-radius 4px, icon 24×24px white
+        const BentoButton = ({ onClick, isOpen = false }) => {
+            const [isHovered, setIsHovered] = useState(false);
+
+            return (
+                <button
+                    onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={{
+                        width: '32px',
+                        height: '32px',
+                        background: isHovered || isOpen ? colors.purple700 : colors.purple500,
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '4px',
+                        transition: 'background 0.15s ease',
+                    }}
+                >
+                    <AppsIcon />
+                </button>
+            );
+        };
+
+        // Kipu Product Icons (matching Figma design)
+        const HelixProductIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3C10.22 3 8.63 4.06 7.76 5.76L6.34 5.11C7.45 3.11 9.56 2 12 2C14.44 2 16.55 3.11 17.66 5.11L16.24 5.76C15.37 4.06 13.78 3 12 3Z" fill="white"/>
+                <path d="M12 21C13.78 21 15.37 19.94 16.24 18.24L17.66 18.89C16.55 20.89 14.44 22 12 22C9.56 22 7.45 20.89 6.34 18.89L7.76 18.24C8.63 19.94 10.22 21 12 21Z" fill="white"/>
+                <path d="M6 12C6 10.22 7.06 8.63 8.76 7.76L8.11 6.34C6.11 7.45 5 9.56 5 12C5 14.44 6.11 16.55 8.11 17.66L8.76 16.24C7.06 15.37 6 13.78 6 12Z" fill="white"/>
+                <path d="M18 12C18 13.78 16.94 15.37 15.24 16.24L15.89 17.66C17.89 16.55 19 14.44 19 12C19 9.56 17.89 7.45 15.89 6.34L15.24 7.76C16.94 8.63 18 10.22 18 12Z" fill="white"/>
+                <circle cx="12" cy="8" r="1.5" fill="white"/>
+                <circle cx="12" cy="16" r="1.5" fill="white"/>
+                <circle cx="8" cy="12" r="1.5" fill="white"/>
+                <circle cx="16" cy="12" r="1.5" fill="white"/>
+            </svg>
+        );
+
+        const EMRProductIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19Z" fill="white"/>
+                <path d="M7 7H11V9H7V7Z" fill="white"/>
+                <path d="M7 11H17V13H7V11Z" fill="white"/>
+                <path d="M7 15H14V17H7V15Z" fill="white"/>
+                <path d="M15 7H17V9H15V7Z" fill="white"/>
+            </svg>
+        );
+
+        const CRMProductIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="6" r="2" fill="white"/>
+                <circle cx="6" cy="18" r="2" fill="white"/>
+                <circle cx="18" cy="18" r="2" fill="white"/>
+                <path d="M12 8V12" stroke="white" strokeWidth="2"/>
+                <path d="M12 12L7 16" stroke="white" strokeWidth="2"/>
+                <path d="M12 12L17 16" stroke="white" strokeWidth="2"/>
+            </svg>
+        );
+
+        // AI brain/sparkle icon for banner
+        const AIBrainIcon = () => (
+            <svg width="96" height="96" viewBox="0 0 96 96" fill="none">
+                <circle cx="48" cy="48" r="40" fill="#D1E3FA" opacity="0.5"/>
+                <path d="M48 20C32.536 20 20 32.536 20 48C20 63.464 32.536 76 48 76C63.464 76 76 63.464 76 48C76 32.536 63.464 20 48 20Z" stroke="#1565C0" strokeWidth="2" fill="none"/>
+                <circle cx="36" cy="40" r="4" fill="#1565C0"/>
+                <circle cx="60" cy="40" r="4" fill="#1565C0"/>
+                <circle cx="48" cy="56" r="4" fill="#1565C0"/>
+                <path d="M36 40L48 56L60 40" stroke="#1565C0" strokeWidth="2"/>
+                <path d="M36 40L48 32L60 40" stroke="#1565C0" strokeWidth="2"/>
+            </svg>
+        );
+
+        // Arrow right icon
+        const ArrowRightIcon = () => (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1565C0">
+                <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z"/>
+            </svg>
+        );
+
+        // Bento Menu Product Item Component
+        const ProductItem = ({ name, icon, iconBgColor, isActive, isDiscover, onClick }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            
+            const borderColor = isActive ? '#EFF5FF' : isDiscover ? '#F0E8FA' : '#F0F0F0';
+            const bgColor = isActive ? '#EFF5FF' : colors.white;
+            const textColor = isActive ? '#2D0A54' : colors.black;
+            
+            return (
+                <button
+                    onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={{
+                        width: '100px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        padding: '16px 12px 12px 12px',
+                        background: isHovered ? '#F8F9FA' : bgColor,
+                        border: `2px solid ${borderColor}`,
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        transition: 'background 0.15s ease',
+                    }}
+                >
+                    <div style={{
+                        width: '40px',
+                        height: '40px',
+                        background: iconBgColor,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}>
+                        {icon}
+                    </div>
+                    <span style={{
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 400,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: textColor,
+                        textAlign: 'center',
+                    }}>
+                        {name}
+                    </span>
+                </button>
+            );
+        };
+
+        // Bento Menu Dropdown - App Switcher Menu (Figma: Kipu Bento Box)
+        const BentoMenu = ({ isOpen, onClose, activeApp = 'EMR' }) => {
+            const menuRef = React.useRef(null);
+
+            React.useEffect(() => {
+                const handleClickOutside = (event) => {
+                    if (menuRef.current && !menuRef.current.contains(event.target)) {
+                        onClose();
+                    }
+                };
+
+                if (isOpen) {
+                    document.addEventListener('mousedown', handleClickOutside);
+                }
+
+                return () => {
+                    document.removeEventListener('mousedown', handleClickOutside);
+                };
+            }, [isOpen, onClose]);
+
+            if (!isOpen) return null;
+
+            // Apps section
+            const apps = [
+                { name: 'Helix', icon: <HelixProductIcon />, iconBgColor: colors.purple700 },
+                { name: 'EMR', icon: <EMRProductIcon />, iconBgColor: colors.purple700, isActive: activeApp === 'EMR' },
+                { name: 'CRM', icon: <CRMProductIcon />, iconBgColor: colors.purple700 },
+            ];
+
+            // Discover More section
+            const discoverApps = [
+                { name: 'RCM', icon: <HelixProductIcon />, iconBgColor: colors.purple700 },
+                { name: 'Labs', icon: <EMRProductIcon />, iconBgColor: colors.purple700 },
+                { name: 'Compliance', icon: <CRMProductIcon />, iconBgColor: colors.purple700 },
+            ];
+
+            return (
+                <div 
+                    ref={menuRef}
+                    style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: '14px',
+                        marginTop: '8px',
+                        width: '420px',
+                        background: colors.white,
+                        borderRadius: '4px',
+                        boxShadow: '0px 2px 20px rgba(0, 0, 0, 0.08)',
+                        padding: '32px 24px 12px 24px',
+                        zIndex: 1000,
+                    }}
+                >
+                    {/* Apps Section */}
+                    <div style={{ paddingBottom: '32px' }}>
+                        <div style={{
+                            fontFamily: "'Roboto', sans-serif",
+                            fontWeight: 400,
+                            fontSize: '14px',
+                            lineHeight: '20px',
+                            color: colors.gray06,
+                            marginBottom: '16px',
+                        }}>
+                            Apps
+                        </div>
+                        <div style={{
+                            display: 'flex',
+                            flexWrap: 'nowrap',
+                            gap: '24px',
+                        }}>
+                                {apps.map((app, index) => (
+                                    <ProductItem
+                                        key={index}
+                                        name={app.name}
+                                        icon={app.icon}
+                                        iconBgColor={app.iconBgColor}
+                                        isActive={app.isActive}
+                                        onClick={() => {
+                                            alert(`${app.name} clicked`);
+                                            onClose();
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                    {/* Discover More Section */}
+                    <div style={{ paddingBottom: '32px' }}>
+                        <div style={{
+                            fontFamily: "'Roboto', sans-serif",
+                            fontWeight: 400,
+                            fontSize: '14px',
+                            lineHeight: '20px',
+                            color: colors.gray06,
+                            marginBottom: '16px',
+                        }}>
+                            Discover More
+                        </div>
+                        <div style={{
+                            display: 'flex',
+                            flexWrap: 'nowrap',
+                            gap: '24px',
+                        }}>
+                            {discoverApps.map((app, index) => (
+                                <ProductItem
+                                    key={index}
+                                    name={app.name}
+                                    icon={app.icon}
+                                    iconBgColor={app.iconBgColor}
+                                    isDiscover={true}
+                                    onClick={() => {
+                                        alert(`${app.name} clicked`);
+                                        onClose();
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Promotional Banner */}
+                    <div style={{
+                        background: '#EFF5FF',
+                        borderRadius: '4px',
+                        padding: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                    }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{
+                                fontFamily: "'Roboto', sans-serif",
+                                fontWeight: 500,
+                                fontSize: '18px',
+                                lineHeight: '22px',
+                                color: colors.black,
+                                marginBottom: '4px',
+                            }}>
+                                Introducing KIP
+                            </div>
+                            <div style={{
+                                fontFamily: "'Roboto', sans-serif",
+                                fontWeight: 400,
+                                fontSize: '14px',
+                                lineHeight: '20px',
+                                color: colors.black,
+                                marginBottom: '10px',
+                            }}>
+                                AI-Powered patient documentation for behavioral health
+                            </div>
+                            <button
+                                onClick={() => alert('Learn more clicked')}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '2px',
+                                    padding: '2px 4px 2px 4px',
+                                    background: 'transparent',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                <span style={{
+                                    fontFamily: "'Roboto', sans-serif",
+                                    fontWeight: 400,
+                                    fontSize: '14px',
+                                    lineHeight: '20px',
+                                    color: '#1565C0',
+                                }}>
+                                    Learn more
+                                </span>
+                                <ArrowRightIcon />
+                            </button>
+                        </div>
+                        <div style={{ flexShrink: 0, width: '96px', height: '96px' }}>
+                            <AIBrainIcon />
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Header Icon Button - Figma specs: 36×36px, purple circle, white icon
+        const HeaderIconButton = ({ icon, onClick, hasAlert = false }) => {
+            const [isHovered, setIsHovered] = useState(false);
+
+            return (
+                <button
+                    onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={{
+                        position: 'relative',
+                        width: '36px',
+                        height: '36px',
+                        background: isHovered ? colors.purple700 : colors.purple500,
+                        border: 'none',
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: 0,
+                        transition: 'background 0.15s ease',
+                    }}
+                >
+                    {icon}
+                    {hasAlert && (
+                        <div style={{
+                            position: 'absolute',
+                            top: '0px',
+                            right: '0px',
+                            width: '10px',
+                            height: '10px',
+                            background: '#E50000',
+                            borderRadius: '50%',
+                            border: `2px solid ${colors.purple500}`,
+                        }} />
+                    )}
+                </button>
+            );
+        };
+
+        // Facility Selector - with hover state similar to icon buttons
+        const FacilitySelector = ({ facilityName, timeZone, onClick }) => {
+            const [isHovered, setIsHovered] = useState(false);
+
+            return (
+                <button
+                    onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        maxWidth: '380px',
+                        padding: '8px 12px',
+                        background: isHovered ? colors.purple700 : colors.purple500,
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        transition: 'background 0.15s ease',
+                    }}
+                >
+                    <span style={{
+                        flex: 1,
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 500,
+                        fontSize: '16px',
+                        lineHeight: '20px',
+                        color: colors.white,
+                        textAlign: 'left',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                    }}>
+                        {facilityName}
+                    </span>
+                    <div style={{
+                        width: '1px',
+                        height: '24px',
+                        background: 'rgba(255,255,255,0.3)',
+                    }} />
+                    <span style={{
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 500,
+                        fontSize: '16px',
+                        lineHeight: '20px',
+                        color: colors.white,
+                        whiteSpace: 'nowrap',
+                    }}>
+                        {timeZone}
+                    </span>
+                    <ChevronDownIcon />
+                </button>
+            );
+        };
+
+        // Avatar Component
+        const Avatar = ({ initials, size = 44 }) => (
+            <div style={{
+                position: 'relative',
+                width: `${size}px`,
+                height: `${size}px`,
+            }}>
+                <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: '50%',
+                    background: `linear-gradient(135deg, ${colors.purple500} 0%, ${colors.purple700} 100%)`,
+                    border: `2px solid rgba(255,255,255,0.3)`,
+                }} />
+                <div style={{
+                    position: 'absolute',
+                    top: '4px',
+                    left: '4px',
+                    width: `${size - 8}px`,
+                    height: `${size - 8}px`,
+                    borderRadius: '50%',
+                    background: colors.purple700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+                    <span style={{
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 400,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: colors.white,
+                    }}>
+                        {initials}
+                    </span>
+                </div>
+            </div>
+        );
+
+        // Company Logo Container
+        const CompanyLogo = ({ companyName }) => (
+            <div style={{
+                width: '100px',
+                height: '50px',
+                background: colors.white,
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '5px 10px',
+            }}>
+                <span style={{
+                    fontFamily: "'Roboto', sans-serif",
+                    fontWeight: 500,
+                    fontSize: '12px',
+                    color: colors.purple500,
+                    textAlign: 'center',
+                }}>
+                    {companyName}
+                </span>
+            </div>
+        );
+
+
+        // Main Global Header Component
+        // Figma specs: Height 70px, Background #6C18C9
+        const KipuGlobalHeader = ({
+            product = 'EMR',
+            facilityName = 'West Palm Beach Treatment',
+            timeZone = '11:42 AM EDT',
+            companyName = 'Canyon Vista',
+            userInitials = 'EF',
+            onMenuClick,
+            onSearchClick,
+            onNotificationsClick,
+            hasNotifications = false,
+            hasMessages = false,
+        }) => {
+            const [isBentoOpen, setIsBentoOpen] = useState(false);
+
+            const headerStyles = {
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%',
+                height: '70px',
+                background: colors.purple500,
+                padding: '0 14px',
+                boxSizing: 'border-box',
+            };
+
+            const leftSectionStyles = {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+            };
+
+            const rightSectionStyles = {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '18px',
+                marginLeft: 'auto',
+            };
+
+            const iconGroupStyles = {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '18px',
+            };
+
+            return (
+                <header style={headerStyles}>
+                    <div style={leftSectionStyles}>
+                        <BentoButton 
+                            onClick={() => {
+                                setIsBentoOpen(!isBentoOpen);
+                                onMenuClick?.();
+                            }} 
+                            isOpen={isBentoOpen}
+                        />
+                        <KipuLogo product={product} />
+                        <div style={{ marginLeft: '20px' }}>
+                            <FacilitySelector 
+                                facilityName={facilityName}
+                                timeZone={timeZone}
+                                onClick={() => {}}
+                            />
+                        </div>
+                    </div>
+                    
+                    <BentoMenu 
+                        isOpen={isBentoOpen} 
+                        onClose={() => setIsBentoOpen(false)}
+                        activeApp={product}
+                    />
+
+                    <div style={rightSectionStyles}>
+                        <div style={iconGroupStyles}>
+                            <HeaderIconButton 
+                                icon={<SearchIcon />} 
+                                onClick={onSearchClick}
+                            />
+                            <HeaderIconButton 
+                                icon={<AIIcon />} 
+                                onClick={() => {}}
+                            />
+                            <HeaderIconButton 
+                                icon={<IncomingIcon />} 
+                                onClick={() => {}}
+                            />
+                            <HeaderIconButton 
+                                icon={<NotificationsIcon />} 
+                                onClick={onNotificationsClick}
+                                hasAlert={hasNotifications}
+                            />
+                            <HeaderIconButton 
+                                icon={<DownloadIcon />} 
+                                onClick={() => {}}
+                            />
+                            <HeaderIconButton 
+                                icon={<EmailIcon />} 
+                                onClick={() => {}}
+                                hasAlert={hasMessages}
+                            />
+                        </div>
+                        <CompanyLogo companyName={companyName} />
+                        <Avatar initials={userInitials} />
+                    </div>
+                </header>
+            );
+        };
+
+        // Demo App
+        const App = () => {
+            const [notifications, setNotifications] = useState(true);
+            const [messages, setMessages] = useState(false);
+
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Navigation</span>
+                            <span>/</span>
+                            <span>Kipu Global Header</span>
+                        </div>
+                        <h1>Kipu Global Header</h1>
+                        <p className="description">
+                            The global header provides consistent navigation across all Kipu applications. 
+                            It includes the Kipu logo, product name, facility selector, action icons, 
+                            company branding, and user avatar.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>Default Header</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                            Height: 70px • Background: #6C18C9 (Purple 500) • Font: Roboto
+                        </p>
+                        <div style={{ 
+                            margin: '0 -2rem',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                        }}>
+                            <KipuGlobalHeader 
+                                product="EMR"
+                                facilityName="West Palm Beach Treatment"
+                                timeZone="11:42 AM EDT"
+                                companyName="Canyon Vista"
+                                userInitials="EF"
+                                hasNotifications={notifications}
+                                hasMessages={messages}
+                            />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>RCM Product Variant</h2>
+                        <div style={{ 
+                            margin: '0 -2rem',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                        }}>
+                            <KipuGlobalHeader 
+                                product="RCM"
+                                facilityName="Main Campus Billing"
+                                timeZone="2:30 PM PST"
+                                companyName="Kipu Health"
+                                userInitials="JD"
+                                hasNotifications={false}
+                                hasMessages={true}
+                            />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>CRM Product Variant</h2>
+                        <div style={{ 
+                            margin: '0 -2rem',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                        }}>
+                            <KipuGlobalHeader 
+                                product="CRM"
+                                facilityName="Admissions Center"
+                                timeZone="9:15 AM CST"
+                                companyName="Recovery First"
+                                userInitials="MK"
+                            />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Bento Menu (App Switcher)</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                            Click the Bento button in the header above to see the app switcher dropdown. 
+                            Follows Figma design with "Apps" and "Discover More" sections, plus promotional banner.
+                        </p>
+                        <div className="preview-area" style={{ flexDirection: 'row', gap: '2rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                            <div>
+                                <span className="variant-label" style={{ display: 'block', marginBottom: '8px' }}>Bento Button (32×32)</span>
+                                <div style={{ background: colors.purple500, padding: '16px', borderRadius: '8px', display: 'inline-flex', gap: '16px', alignItems: 'center' }}>
+                                    <BentoButton onClick={() => {}} />
+                                    <BentoButton onClick={() => {}} isOpen={true} />
+                                </div>
+                                <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                                    Default &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Active/Open
+                                </div>
+                            </div>
+                            <div style={{ position: 'relative' }}>
+                                <span className="variant-label" style={{ display: 'block', marginBottom: '8px' }}>Kipu Bento Box (Static Preview)</span>
+                                <div style={{ 
+                                    width: '420px',
+                                    background: colors.white,
+                                    borderRadius: '4px',
+                                    boxShadow: '0px 2px 20px rgba(0, 0, 0, 0.08)',
+                                    padding: '32px 24px 12px 24px',
+                                }}>
+                                    {/* Apps Section */}
+                                    <div style={{ paddingBottom: '32px' }}>
+                                        <div style={{
+                                            fontFamily: "'Roboto', sans-serif",
+                                            fontWeight: 400,
+                                            fontSize: '14px',
+                                            lineHeight: '20px',
+                                            color: colors.gray06,
+                                            marginBottom: '16px',
+                                        }}>
+                                            Apps
+                                        </div>
+                                        <div style={{ display: 'flex', flexWrap: 'nowrap', gap: '24px' }}>
+                                                {/* Helix */}
+                                                <div style={{
+                                                    width: '100px',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '8px',
+                                                    padding: '16px 12px 12px 12px',
+                                                    background: colors.white,
+                                                    border: '2px solid #F0F0F0',
+                                                    borderRadius: '4px',
+                                                }}>
+                                                    <div style={{ width: '40px', height: '40px', background: colors.purple700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <HelixProductIcon />
+                                                    </div>
+                                                    <span style={{ fontFamily: "'Roboto', sans-serif", fontWeight: 400, fontSize: '14px', color: colors.black }}>Helix</span>
+                                                </div>
+                                                {/* EMR (Active) */}
+                                                <div style={{
+                                                    width: '100px',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '8px',
+                                                    padding: '16px 12px 12px 12px',
+                                                    background: '#EFF5FF',
+                                                    border: '2px solid #EFF5FF',
+                                                    borderRadius: '4px',
+                                                }}>
+                                                    <div style={{ width: '40px', height: '40px', background: colors.purple700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <EMRProductIcon />
+                                                    </div>
+                                                    <span style={{ fontFamily: "'Roboto', sans-serif", fontWeight: 400, fontSize: '14px', color: '#2D0A54' }}>EMR</span>
+                                                </div>
+                                                {/* CRM */}
+                                                <div style={{
+                                                    width: '100px',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '8px',
+                                                    padding: '16px 12px 12px 12px',
+                                                    background: colors.white,
+                                                    border: '2px solid #F0F0F0',
+                                                    borderRadius: '4px',
+                                                }}>
+                                                    <div style={{ width: '40px', height: '40px', background: colors.purple700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <CRMProductIcon />
+                                                    </div>
+                                                    <span style={{ fontFamily: "'Roboto', sans-serif", fontWeight: 400, fontSize: '14px', color: colors.black }}>CRM</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    {/* Discover More Section */}
+                                    <div style={{ paddingBottom: '32px' }}>
+                                        <div style={{
+                                            fontFamily: "'Roboto', sans-serif",
+                                            fontWeight: 400,
+                                            fontSize: '14px',
+                                            lineHeight: '20px',
+                                            color: colors.gray06,
+                                            marginBottom: '16px',
+                                        }}>
+                                            Discover More
+                                        </div>
+                                        <div style={{ display: 'flex', flexWrap: 'nowrap', gap: '24px' }}>
+                                            {/* RCM */}
+                                            <div style={{
+                                                width: '100px',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '8px',
+                                                padding: '16px 12px 12px 12px',
+                                                background: colors.white,
+                                                border: '2px solid #F0E8FA',
+                                                borderRadius: '4px',
+                                            }}>
+                                                <div style={{ width: '40px', height: '40px', background: colors.purple700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <HelixProductIcon />
+                                                </div>
+                                                <span style={{ fontFamily: "'Roboto', sans-serif", fontWeight: 400, fontSize: '14px', color: colors.black }}>RCM</span>
+                                            </div>
+                                            {/* Labs */}
+                                            <div style={{
+                                                width: '100px',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '8px',
+                                                padding: '16px 12px 12px 12px',
+                                                background: colors.white,
+                                                border: '2px solid #F0E8FA',
+                                                borderRadius: '4px',
+                                            }}>
+                                                <div style={{ width: '40px', height: '40px', background: colors.purple700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <EMRProductIcon />
+                                                </div>
+                                                <span style={{ fontFamily: "'Roboto', sans-serif", fontWeight: 400, fontSize: '14px', color: colors.black }}>Labs</span>
+                                            </div>
+                                            {/* Compliance */}
+                                            <div style={{
+                                                width: '100px',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '8px',
+                                                padding: '16px 12px 12px 12px',
+                                                background: colors.white,
+                                                border: '2px solid #F0E8FA',
+                                                borderRadius: '4px',
+                                            }}>
+                                                <div style={{ width: '40px', height: '40px', background: colors.purple700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <CRMProductIcon />
+                                                </div>
+                                                <span style={{ fontFamily: "'Roboto', sans-serif", fontWeight: 400, fontSize: '14px', color: colors.black }}>Compliance</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Promotional Banner */}
+                                    <div style={{
+                                        background: '#EFF5FF',
+                                        borderRadius: '4px',
+                                        padding: '24px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '12px',
+                                    }}>
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{
+                                                fontFamily: "'Roboto', sans-serif",
+                                                fontWeight: 500,
+                                                fontSize: '18px',
+                                                lineHeight: '22px',
+                                                color: colors.black,
+                                                marginBottom: '4px',
+                                            }}>
+                                                Introducing KIP
+                                            </div>
+                                            <div style={{
+                                                fontFamily: "'Roboto', sans-serif",
+                                                fontWeight: 400,
+                                                fontSize: '14px',
+                                                lineHeight: '20px',
+                                                color: colors.black,
+                                                marginBottom: '10px',
+                                            }}>
+                                                AI-Powered patient documentation for behavioral health
+                                            </div>
+                                            <div style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '2px',
+                                            }}>
+                                                <span style={{
+                                                    fontFamily: "'Roboto', sans-serif",
+                                                    fontWeight: 400,
+                                                    fontSize: '14px',
+                                                    lineHeight: '20px',
+                                                    color: '#1565C0',
+                                                }}>
+                                                    Learn more
+                                                </span>
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="#1565C0">
+                                                    <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div style={{ flexShrink: 0, width: '96px', height: '96px' }}>
+                                            <AIBrainIcon />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Header Elements</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '2rem', alignItems: 'flex-start' }}>
+                            
+                            <div>
+                                <span className="variant-label" style={{ display: 'block', marginBottom: '8px' }}>Kipu Logo with Product Name</span>
+                                <div style={{ background: colors.purple500, padding: '16px', borderRadius: '8px', display: 'inline-block' }}>
+                                    <KipuLogo product="EMR" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <span className="variant-label" style={{ display: 'block', marginBottom: '8px' }}>Facility Selector</span>
+                                <div style={{ background: colors.purple500, padding: '16px', borderRadius: '8px', display: 'inline-block' }}>
+                                    <FacilitySelector 
+                                        facilityName="West Palm Beach Treatment"
+                                        timeZone="11:42 AM EDT"
+                                        onClick={() => alert('Facility selector clicked')}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <span className="variant-label" style={{ display: 'block', marginBottom: '8px' }}>Header Icon Buttons (36×36) - All Icons</span>
+                                <div style={{ background: colors.purple500, padding: '16px', borderRadius: '8px', display: 'inline-flex', gap: '18px', alignItems: 'flex-start' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                                        <HeaderIconButton icon={<SearchIcon />} onClick={() => alert('Search')} />
+                                        <span style={{ color: 'white', fontSize: '10px', fontFamily: "'Roboto', sans-serif" }}>Search</span>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                                        <HeaderIconButton icon={<AIIcon />} onClick={() => alert('AI')} />
+                                        <span style={{ color: 'white', fontSize: '10px', fontFamily: "'Roboto', sans-serif" }}>AI</span>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                                        <HeaderIconButton icon={<IncomingIcon />} onClick={() => alert('Incoming')} />
+                                        <span style={{ color: 'white', fontSize: '10px', fontFamily: "'Roboto', sans-serif" }}>Incoming</span>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                                        <HeaderIconButton icon={<NotificationsIcon />} onClick={() => alert('Notifications')} hasAlert />
+                                        <span style={{ color: 'white', fontSize: '10px', fontFamily: "'Roboto', sans-serif" }}>Alerts</span>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                                        <HeaderIconButton icon={<DownloadIcon />} onClick={() => alert('Download')} />
+                                        <span style={{ color: 'white', fontSize: '10px', fontFamily: "'Roboto', sans-serif" }}>Download</span>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                                        <HeaderIconButton icon={<EmailIcon />} onClick={() => alert('Messages')} />
+                                        <span style={{ color: 'white', fontSize: '10px', fontFamily: "'Roboto', sans-serif" }}>Messages</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <span className="variant-label" style={{ display: 'block', marginBottom: '8px' }}>Avatar (44×44)</span>
+                                <div style={{ background: colors.purple500, padding: '16px', borderRadius: '8px', display: 'inline-flex', gap: '12px' }}>
+                                    <Avatar initials="EF" />
+                                    <Avatar initials="JD" />
+                                    <Avatar initials="MK" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <span className="variant-label" style={{ display: 'block', marginBottom: '8px' }}>Company Logo Container (100×50)</span>
+                                <CompanyLogo companyName="Canyon Vista" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Design Specifications</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Element</th>
+                                    <th>Specification</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Header Height</td>
+                                    <td><code>70px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Background Color</td>
+                                    <td><code>#6C18C9</code> (Purple 500)</td>
+                                </tr>
+                                <tr>
+                                    <td>Bento Button</td>
+                                    <td><code>32×32px</code>, border-radius: 4px</td>
+                                </tr>
+                                <tr>
+                                    <td>Product Name Font</td>
+                                    <td><code>Roboto Light, 24px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Facility Selector Font</td>
+                                    <td><code>Roboto Medium, 16px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Facility Selector Hover</td>
+                                    <td>Background: #4D118F (Purple 700), transition: 0.15s ease</td>
+                                </tr>
+                                <tr>
+                                    <td>Header Icon Buttons</td>
+                                    <td><code>36×36px</code>, circular, background: #6C18C9 (Purple 500), hover: #4D118F (Purple 700)</td>
+                                </tr>
+                                <tr>
+                                    <td>Icon Size</td>
+                                    <td><code>24×24px</code>, fill: white</td>
+                                </tr>
+                                <tr>
+                                    <td>Available Icons</td>
+                                    <td>Search, AI Sparkle, Incoming/Contact, Notifications, Download, Email</td>
+                                </tr>
+                                <tr>
+                                    <td>Company Logo Container</td>
+                                    <td><code>100×50px</code>, white background, border-radius: 4px</td>
+                                </tr>
+                                <tr>
+                                    <td>Avatar</td>
+                                    <td><code>44×44px</code>, circular with border</td>
+                                </tr>
+                                <tr>
+                                    <td>Spacing (Icon Group)</td>
+                                    <td><code>18px</code> gap</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>product</code></td>
+                                    <td><code>string</code></td>
+                                    <td><code>'EMR'</code></td>
+                                    <td>Product name displayed next to logo</td>
+                                </tr>
+                                <tr>
+                                    <td><code>facilityName</code></td>
+                                    <td><code>string</code></td>
+                                    <td>-</td>
+                                    <td>Current facility name</td>
+                                </tr>
+                                <tr>
+                                    <td><code>timeZone</code></td>
+                                    <td><code>string</code></td>
+                                    <td>-</td>
+                                    <td>Current time and timezone</td>
+                                </tr>
+                                <tr>
+                                    <td><code>companyName</code></td>
+                                    <td><code>string</code></td>
+                                    <td>-</td>
+                                    <td>Company/client name</td>
+                                </tr>
+                                <tr>
+                                    <td><code>userInitials</code></td>
+                                    <td><code>string</code></td>
+                                    <td>-</td>
+                                    <td>User initials for avatar</td>
+                                </tr>
+                                <tr>
+                                    <td><code>hasNotifications</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Show notification badge</td>
+                                </tr>
+                                <tr>
+                                    <td><code>hasMessages</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Show messages badge</td>
+                                </tr>
+                                <tr>
+                                    <td><code>onMenuClick</code></td>
+                                    <td><code>function</code></td>
+                                    <td>-</td>
+                                    <td>Bento menu click handler</td>
+                                </tr>
+                                <tr>
+                                    <td><code>onSearchClick</code></td>
+                                    <td><code>function</code></td>
+                                    <td>-</td>
+                                    <td>Search icon click handler</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { KipuGlobalHeader } from '@kipu/design-system';
+
+<KipuGlobalHeader
+  product="EMR"
+  facilityName="West Palm Beach Treatment"
+  timeZone="11:42 AM EDT"
+  companyName="Canyon Vista"
+  userInitials="EF"
+  hasNotifications={true}
+  onMenuClick={() => openMenu()}
+  onSearchClick={() => openSearch()}
+  onNotificationsClick={() => openNotifications()}
+/>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

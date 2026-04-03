@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tooltip - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useRef } = React;
+
+        // Tooltip Component
+        const Tooltip = ({ 
+            children,
+            content,
+            position = 'top',
+            delay = 200,
+        }) => {
+            const [isVisible, setIsVisible] = useState(false);
+            const timeoutRef = useRef(null);
+
+            const handleMouseEnter = () => {
+                timeoutRef.current = setTimeout(() => setIsVisible(true), delay);
+            };
+
+            const handleMouseLeave = () => {
+                clearTimeout(timeoutRef.current);
+                setIsVisible(false);
+            };
+
+            const containerStyles = {
+                position: 'relative',
+                display: 'inline-block',
+            };
+
+            const getTooltipPosition = () => {
+                const positions = {
+                    top: { bottom: '100%', left: '50%', transform: 'translateX(-50%)', marginBottom: '8px' },
+                    bottom: { top: '100%', left: '50%', transform: 'translateX(-50%)', marginTop: '8px' },
+                    left: { right: '100%', top: '50%', transform: 'translateY(-50%)', marginRight: '8px' },
+                    right: { left: '100%', top: '50%', transform: 'translateY(-50%)', marginLeft: '8px' },
+                };
+                return positions[position];
+            };
+
+            const tooltipStyles = {
+                position: 'absolute',
+                ...getTooltipPosition(),
+                background: '#1e293b',
+                color: 'white',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                fontSize: '13px',
+                whiteSpace: 'nowrap',
+                zIndex: 1000,
+                opacity: isVisible ? 1 : 0,
+                visibility: isVisible ? 'visible' : 'hidden',
+                transition: 'opacity 0.15s ease, visibility 0.15s ease',
+                pointerEvents: 'none',
+            };
+
+            const arrowStyles = {
+                position: 'absolute',
+                width: 0,
+                height: 0,
+                border: '6px solid transparent',
+                ...(position === 'top' ? { top: '100%', left: '50%', transform: 'translateX(-50%)', borderTopColor: '#1e293b' } : {}),
+                ...(position === 'bottom' ? { bottom: '100%', left: '50%', transform: 'translateX(-50%)', borderBottomColor: '#1e293b' } : {}),
+                ...(position === 'left' ? { left: '100%', top: '50%', transform: 'translateY(-50%)', borderLeftColor: '#1e293b' } : {}),
+                ...(position === 'right' ? { right: '100%', top: '50%', transform: 'translateY(-50%)', borderRightColor: '#1e293b' } : {}),
+            };
+
+            return (
+                <span 
+                    style={containerStyles}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                >
+                    {children}
+                    <span style={tooltipStyles}>
+                        {content}
+                        <span style={arrowStyles} />
+                    </span>
+                </span>
+            );
+        };
+
+        // Kipu Design System SmallButton (matching Figma exactly)
+        const Button = ({ children, variant = 'filled', style = {}, disabled = false }) => {
+            const [isHovered, setIsHovered] = React.useState(false);
+            
+            const colors = {
+                blue500: '#1565C0',
+                blue700: '#0F4888',
+                lightBlue100: '#EFF5FF',
+                white: '#FFFFFF',
+                gray04: '#CCCCCC',
+            };
+            
+            const baseStyles = {
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: 500,
+                fontFamily: "'Roboto', sans-serif",
+                borderRadius: '100px',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                minHeight: '38px',
+                textTransform: 'uppercase',
+                letterSpacing: '0',
+                lineHeight: '100%',
+                border: 'none',
+                outline: 'none',
+                opacity: disabled ? 0.6 : 1,
+            };
+            
+            const getVariantStyles = () => {
+                if (variant === 'filled') {
+                    return {
+                        background: disabled ? colors.gray04 : (isHovered ? colors.blue700 : colors.blue500),
+                        color: colors.white,
+                        boxShadow: disabled ? 'none' : (isHovered ? '0px 2px 12px rgba(0, 0, 0, 0.2)' : '0px 2px 12px rgba(0, 0, 0, 0.12)'),
+                    };
+                }
+                if (variant === 'outlined') {
+                    return {
+                        background: isHovered && !disabled ? colors.lightBlue100 : 'transparent',
+                        color: disabled ? colors.gray04 : (isHovered ? colors.blue700 : colors.blue500),
+                        border: `2px solid ${disabled ? colors.gray04 : (isHovered ? colors.blue700 : colors.blue500)}`,
+                        boxShadow: isHovered && !disabled ? '0px 1px 8px rgba(0, 0, 0, 0.14)' : 'none',
+                    };
+                }
+                return {};
+            };
+            
+            return (
+                <button 
+                    style={{ ...baseStyles, ...getVariantStyles(), ...style }}
+                    disabled={disabled}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    {children}
+                </button>
+            );
+        };
+
+        // Icon Button
+        const IconButton = ({ children, ariaLabel }) => (
+            <button 
+                style={{
+                    width: 40, height: 40, borderRadius: '50%', border: 'none',
+                    background: '#f1f5f9', cursor: 'pointer', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center'
+                }}
+                aria-label={ariaLabel}
+            >
+                {children}
+            </button>
+        );
+
+        // Icons
+        const DeleteIcon = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#64748b">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+        );
+
+        const EditIcon = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#64748b">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+        );
+
+        const ShareIcon = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#64748b">
+                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+            </svg>
+        );
+
+        // Demo App
+        const App = () => {
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Tooltips</span>
+                            <span>/</span>
+                            <span>Tooltip</span>
+                        </div>
+                        <h1>Tooltip</h1>
+                        <p className="description">
+                            Tooltips briefly describe a UI element. They're best used for labelling 
+                            UI elements with no text, like icon-only buttons and fields.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>Positions</h2>
+                        <div className="preview-area" style={{ padding: '60px', gap: '24px' }}>
+                            <Tooltip content="Tooltip on top" position="top">
+                                <Button>Top</Button>
+                            </Tooltip>
+                            <Tooltip content="Tooltip on bottom" position="bottom">
+                                <Button>Bottom</Button>
+                            </Tooltip>
+                            <Tooltip content="Tooltip on left" position="left">
+                                <Button>Left</Button>
+                            </Tooltip>
+                            <Tooltip content="Tooltip on right" position="right">
+                                <Button>Right</Button>
+                            </Tooltip>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Icon Buttons with Tooltips</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666' }}>
+                            Tooltips are essential for icon-only buttons to provide accessibility labels.
+                        </p>
+                        <div className="preview-area" style={{ gap: '16px' }}>
+                            <Tooltip content="Delete item">
+                                <IconButton ariaLabel="Delete">
+                                    <DeleteIcon />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip content="Edit item">
+                                <IconButton ariaLabel="Edit">
+                                    <EditIcon />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip content="Share">
+                                <IconButton ariaLabel="Share">
+                                    <ShareIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>On Text Elements</h2>
+                        <div className="preview-area" style={{ padding: '40px' }}>
+                            <p style={{ margin: 0 }}>
+                                Hover over this{' '}
+                                <Tooltip content="This provides additional context">
+                                    <span style={{ 
+                                        color: '#1565C0', 
+                                        textDecoration: 'underline', 
+                                        cursor: 'help' 
+                                    }}>
+                                        underlined text
+                                    </span>
+                                </Tooltip>
+                                {' '}to see the tooltip.
+                            </p>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Disabled Element Tooltip</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666' }}>
+                            Use tooltips to explain why an element is disabled.
+                        </p>
+                        <div className="preview-area">
+                            <Tooltip content="You don't have permission to perform this action">
+                                <span>
+                                    <Button variant="filled" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+                                        Disabled Action
+                                    </Button>
+                                </span>
+                            </Tooltip>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>content</code></td>
+                                    <td><code>string | ReactNode</code></td>
+                                    <td>Required</td>
+                                    <td>Tooltip content</td>
+                                </tr>
+                                <tr>
+                                    <td><code>position</code></td>
+                                    <td><code>'top' | 'bottom' | 'left' | 'right'</code></td>
+                                    <td><code>'top'</code></td>
+                                    <td>Position relative to trigger</td>
+                                </tr>
+                                <tr>
+                                    <td><code>delay</code></td>
+                                    <td><code>number</code></td>
+                                    <td><code>200</code></td>
+                                    <td>Delay before showing (ms)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { Tooltip } from '@kipu/design-system';
+
+// Basic tooltip
+<Tooltip content="Delete this item">
+  <IconButton>
+    <DeleteIcon />
+  </IconButton>
+</Tooltip>
+
+// Different positions
+<Tooltip content="Info" position="bottom">
+  <Button>Hover me</Button>
+</Tooltip>
+
+// On disabled elements
+<Tooltip content="You don't have permission">
+  <span>
+    <Button disabled>Can't click</Button>
+  </span>
+</Tooltip>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

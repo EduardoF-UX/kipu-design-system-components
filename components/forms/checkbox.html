@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkbox - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Checkbox Component
+        const Checkbox = ({ 
+            checked = false,
+            indeterminate = false,
+            onChange,
+            label,
+            disabled = false,
+            error = false,
+            size = 'medium',
+        }) => {
+            const [isHovered, setIsHovered] = useState(false);
+
+            const sizes = {
+                small: { box: 16, icon: 12 },
+                medium: { box: 20, icon: 14 },
+                large: { box: 24, icon: 18 },
+            };
+
+            const { box, icon } = sizes[size];
+
+            const containerStyles = {
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                opacity: disabled ? 0.5 : 1,
+            };
+
+            const boxStyles = {
+                width: box,
+                height: box,
+                borderRadius: '4px',
+                border: `2px solid ${error ? '#DC2626' : (checked || indeterminate ? '#1565C0' : '#94a3b8')}`,
+                background: (checked || indeterminate) ? '#1565C0' : 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease',
+                transform: isHovered && !disabled ? 'scale(1.1)' : 'scale(1)',
+            };
+
+            const labelStyles = {
+                fontSize: size === 'small' ? '14px' : '16px',
+                color: error ? '#DC2626' : '#1e293b',
+            };
+
+            const handleClick = () => {
+                if (!disabled && onChange) {
+                    onChange(!checked);
+                }
+            };
+
+            return (
+                <label 
+                    style={containerStyles}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    onClick={handleClick}
+                >
+                    <span style={boxStyles}>
+                        {(checked || indeterminate) && (
+                            <svg width={icon} height={icon} viewBox="0 0 24 24" fill="white">
+                                {indeterminate ? (
+                                    <path d="M19 13H5v-2h14v2z"/>
+                                ) : (
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                )}
+                            </svg>
+                        )}
+                    </span>
+                    {label && <span style={labelStyles}>{label}</span>}
+                </label>
+            );
+        };
+
+        // Checkbox Group Component
+        const CheckboxGroup = ({ 
+            label,
+            options,
+            value = [],
+            onChange,
+            orientation = 'vertical',
+            error,
+            helperText,
+        }) => {
+            const handleChange = (optionValue, checked) => {
+                if (checked) {
+                    onChange([...value, optionValue]);
+                } else {
+                    onChange(value.filter(v => v !== optionValue));
+                }
+            };
+
+            return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {label && (
+                        <span style={{ 
+                            fontSize: '14px', 
+                            fontWeight: 500, 
+                            color: error ? '#DC2626' : '#64748b' 
+                        }}>
+                            {label}
+                        </span>
+                    )}
+                    <div style={{ 
+                        display: 'flex', 
+                        flexDirection: orientation === 'vertical' ? 'column' : 'row',
+                        gap: orientation === 'vertical' ? '8px' : '24px',
+                    }}>
+                        {options.map(option => (
+                            <Checkbox
+                                key={option.value}
+                                checked={value.includes(option.value)}
+                                onChange={(checked) => handleChange(option.value, checked)}
+                                label={option.label}
+                                disabled={option.disabled}
+                                error={error}
+                            />
+                        ))}
+                    </div>
+                    {helperText && (
+                        <span style={{ fontSize: '12px', color: error ? '#DC2626' : '#64748b' }}>
+                            {helperText}
+                        </span>
+                    )}
+                </div>
+            );
+        };
+
+        // Demo App
+        const App = () => {
+            const [singleChecked, setSingleChecked] = useState(false);
+            const [selectedOptions, setSelectedOptions] = useState(['option1']);
+
+            const options = [
+                { value: 'option1', label: 'Option 1' },
+                { value: 'option2', label: 'Option 2' },
+                { value: 'option3', label: 'Option 3' },
+            ];
+
+            const optionsWithDisabled = [
+                { value: 'enabled', label: 'Enabled option' },
+                { value: 'disabled', label: 'Disabled option', disabled: true },
+                { value: 'another', label: 'Another option' },
+            ];
+
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Forms</span>
+                            <span>/</span>
+                            <span>Checkbox</span>
+                        </div>
+                        <h1>Checkbox</h1>
+                        <p className="description">
+                            Checkboxes allow users to select one or more options from a set, 
+                            present a list containing sub-selections, or turn an item on or off.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>States</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
+                            <Checkbox label="Unchecked" checked={false} onChange={() => {}} />
+                            <Checkbox label="Checked" checked={true} onChange={() => {}} />
+                            <Checkbox label="Indeterminate" indeterminate={true} onChange={() => {}} />
+                            <Checkbox label="Disabled unchecked" disabled onChange={() => {}} />
+                            <Checkbox label="Disabled checked" checked disabled onChange={() => {}} />
+                            <Checkbox label="Error state" error onChange={() => {}} />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Sizes</h2>
+                        <div className="preview-area" style={{ gap: '2rem' }}>
+                            <Checkbox label="Small" size="small" checked onChange={() => {}} />
+                            <Checkbox label="Medium (default)" size="medium" checked onChange={() => {}} />
+                            <Checkbox label="Large" size="large" checked onChange={() => {}} />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Interactive Example</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <Checkbox 
+                                label="Click me to toggle"
+                                checked={singleChecked}
+                                onChange={setSingleChecked}
+                            />
+                            <span style={{ color: '#666', fontSize: '14px' }}>
+                                State: {singleChecked ? 'Checked' : 'Unchecked'}
+                            </span>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Checkbox Group (Vertical)</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <CheckboxGroup
+                                label="Select options"
+                                options={options}
+                                value={selectedOptions}
+                                onChange={setSelectedOptions}
+                                helperText="Choose one or more options"
+                            />
+                            <span style={{ color: '#666', fontSize: '14px', marginTop: '8px' }}>
+                                Selected: {selectedOptions.join(', ') || 'None'}
+                            </span>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Checkbox Group (Horizontal)</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <CheckboxGroup
+                                label="Horizontal layout"
+                                options={options}
+                                value={selectedOptions}
+                                onChange={setSelectedOptions}
+                                orientation="horizontal"
+                            />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>With Disabled Options</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <CheckboxGroup
+                                options={optionsWithDisabled}
+                                value={['enabled']}
+                                onChange={() => {}}
+                            />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props - Checkbox</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>checked</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Whether checkbox is checked</td>
+                                </tr>
+                                <tr>
+                                    <td><code>indeterminate</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Show indeterminate state</td>
+                                </tr>
+                                <tr>
+                                    <td><code>onChange</code></td>
+                                    <td><code>function</code></td>
+                                    <td>-</td>
+                                    <td>Called when state changes</td>
+                                </tr>
+                                <tr>
+                                    <td><code>label</code></td>
+                                    <td><code>string</code></td>
+                                    <td>-</td>
+                                    <td>Label text</td>
+                                </tr>
+                                <tr>
+                                    <td><code>size</code></td>
+                                    <td><code>'small' | 'medium' | 'large'</code></td>
+                                    <td><code>'medium'</code></td>
+                                    <td>Size of checkbox</td>
+                                </tr>
+                                <tr>
+                                    <td><code>disabled</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Disable the checkbox</td>
+                                </tr>
+                                <tr>
+                                    <td><code>error</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Show error state</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { Checkbox, CheckboxGroup } from '@kipu/design-system';
+
+// Single checkbox
+const [agreed, setAgreed] = useState(false);
+
+<Checkbox 
+  label="I agree to the terms"
+  checked={agreed}
+  onChange={setAgreed}
+/>
+
+// Checkbox group
+const [selected, setSelected] = useState(['opt1']);
+
+<CheckboxGroup
+  label="Select options"
+  options={[
+    { value: 'opt1', label: 'Option 1' },
+    { value: 'opt2', label: 'Option 2' },
+  ]}
+  value={selected}
+  onChange={setSelected}
+/>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

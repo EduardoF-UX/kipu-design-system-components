@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segmented Buttons - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Kipu Design System Colors for Segmented Buttons (from Figma)
+        const segmentedColors = {
+            selectedBg: '#DBEAFE',      // Light Blue/light-blue-300
+            unselectedBg: '#FFFFFF',    // Neutral/white
+            border: '#CCCCCC',          // Neutral/gray-04
+            selectedText: '#000000',    // Neutral/black
+            unselectedText: '#333333',  // Neutral/gray-07
+            disabledText: '#999999',    // Neutral/gray-05
+        };
+
+        // Check Icon for Relaxed variant
+        const CheckIcon = ({ size = 18 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+        );
+
+        // Segmented Button Component - Kipu Design System
+        const SegmentedButtons = ({ 
+            options, 
+            value, 
+            onChange, 
+            variant = 'flat',
+            disabled = false,
+            multiSelect = false,
+            showCheckIcon = false,
+        }) => {
+            const containerStyles = {
+                display: 'inline-flex',
+            };
+
+            const getButtonStyles = (isSelected, isFirst, isLast, index, totalOptions) => {
+                const isFlat = variant === 'flat';
+                
+                return {
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px',
+                    padding: isFlat 
+                        ? (isFirst ? '8px 12px 8px 16px' : isLast ? '8px 16px 8px 12px' : '8px 12px')
+                        : (isFirst ? '12px 16px 12px 24px' : isLast ? '12px 24px 12px 16px' : '12px 16px'),
+                    fontSize: isFlat ? '14px' : '16px',
+                    lineHeight: '20px',
+                    fontWeight: isSelected ? 500 : 400,
+                    fontFamily: "'Roboto', sans-serif",
+                    background: isSelected ? segmentedColors.selectedBg : segmentedColors.unselectedBg,
+                    color: disabled ? segmentedColors.disabledText : (isSelected ? segmentedColors.selectedText : segmentedColors.unselectedText),
+                    cursor: disabled ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.15s ease',
+                    opacity: disabled ? 0.6 : 1,
+                    border: `2px solid ${segmentedColors.border}`,
+                    borderRight: isLast ? `2px solid ${segmentedColors.border}` : `1px solid ${segmentedColors.border}`,
+                    borderLeft: isFirst ? `2px solid ${segmentedColors.border}` : `1px solid ${segmentedColors.border}`,
+                    borderRadius: isFirst 
+                        ? '100px 0 0 100px' 
+                        : isLast 
+                            ? '0 100px 100px 0' 
+                            : '0',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                };
+            };
+
+            const handleClick = (optionValue) => {
+                if (disabled) return;
+                
+                if (multiSelect) {
+                    const currentValues = Array.isArray(value) ? value : [];
+                    if (currentValues.includes(optionValue)) {
+                        onChange(currentValues.filter(v => v !== optionValue));
+                    } else {
+                        onChange([...currentValues, optionValue]);
+                    }
+                } else {
+                    onChange(optionValue);
+                }
+            };
+
+            const isSelectedOption = (optionValue) => {
+                if (multiSelect) {
+                    return Array.isArray(value) && value.includes(optionValue);
+                }
+                return value === optionValue;
+            };
+
+            const showCheck = variant === 'relaxed' || showCheckIcon;
+
+            return (
+                <div style={containerStyles}>
+                    {options.map((option, index) => {
+                        const selected = isSelectedOption(option.value);
+                        const isFirst = index === 0;
+                        const isLast = index === options.length - 1;
+                        
+                        return (
+                            <button
+                                key={option.value}
+                                style={getButtonStyles(selected, isFirst, isLast, index, options.length)}
+                                onClick={() => handleClick(option.value)}
+                                disabled={disabled}
+                            >
+                                {showCheck && selected && (
+                                    <CheckIcon size={variant === 'relaxed' ? 18 : 16} />
+                                )}
+                                {option.icon && !showCheck && (
+                                    <span style={{ display: 'inline-flex' }}>{option.icon}</span>
+                                )}
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {option.label}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+            );
+        };
+
+        // Demo App
+        const App = () => {
+            const [singleValue, setSingleValue] = useState('option1');
+            const [multiValue, setMultiValue] = useState(['option1']);
+            const [viewMode, setViewMode] = useState('day');
+
+            const basicOptions = [
+                { value: 'option1', label: 'Option 1' },
+                { value: 'option2', label: 'Option 2' },
+            ];
+
+            const threeOptions = [
+                { value: 'option1', label: 'First' },
+                { value: 'option2', label: 'Second' },
+                { value: 'option3', label: 'Third' },
+            ];
+
+            const viewOptions = [
+                { value: 'day', label: 'Day' },
+                { value: 'week', label: 'Week' },
+                { value: 'month', label: 'Month' },
+                { value: 'year', label: 'Year' },
+            ];
+
+            const fiveOptions = [
+                { value: '1', label: 'Mon' },
+                { value: '2', label: 'Tue' },
+                { value: '3', label: 'Wed' },
+                { value: '4', label: 'Thu' },
+                { value: '5', label: 'Fri' },
+            ];
+
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Buttons</span>
+                            <span>/</span>
+                            <span>Segmented Buttons</span>
+                        </div>
+                        <h1>Segmented Buttons</h1>
+                        <p className="description">
+                            Segmented buttons help people select options, switch views, and sort elements. 
+                            Available in Flat (36px) and Relaxed (44px) variants with pill-shaped ends.
+                            Do not use more than 5 options.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>Variants</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                            Flat: 36px height, 14px font • Relaxed: 44px height, 16px font with check icon
+                        </p>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '2rem' }}>
+                            <div className="preview-column">
+                                <span className="variant-label">Flat (Compact)</span>
+                                <SegmentedButtons 
+                                    options={basicOptions} 
+                                    value={singleValue} 
+                                    onChange={setSingleValue}
+                                    variant="flat"
+                                />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Relaxed</span>
+                                <SegmentedButtons 
+                                    options={basicOptions} 
+                                    value={singleValue} 
+                                    onChange={setSingleValue}
+                                    variant="relaxed"
+                                />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Number of Segments</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '1.5rem' }}>
+                            <div className="preview-column">
+                                <span className="variant-label">2 Options</span>
+                                <SegmentedButtons 
+                                    options={basicOptions} 
+                                    value={singleValue} 
+                                    onChange={setSingleValue}
+                                />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">3 Options</span>
+                                <SegmentedButtons 
+                                    options={threeOptions} 
+                                    value={singleValue} 
+                                    onChange={setSingleValue}
+                                />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">4 Options (View Switcher)</span>
+                                <SegmentedButtons 
+                                    options={viewOptions} 
+                                    value={viewMode} 
+                                    onChange={setViewMode}
+                                />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">5 Options (Max Recommended)</span>
+                                <SegmentedButtons 
+                                    options={fiveOptions} 
+                                    value={'3'} 
+                                    onChange={() => {}}
+                                />
+                            </div>
+                        </div>
+                        <p style={{ marginTop: '1rem', color: '#666', fontSize: '0.875rem' }}>
+                            Note: Do not use more than 5 options in a segmented button group.
+                        </p>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>States</h2>
+                        <div className="state-grid">
+                            <div className="state-item">
+                                <span className="label">Enabled</span>
+                                <SegmentedButtons 
+                                    options={basicOptions} 
+                                    value="option1" 
+                                    onChange={() => {}}
+                                />
+                            </div>
+                            <div className="state-item">
+                                <span className="label">Disabled</span>
+                                <SegmentedButtons 
+                                    options={basicOptions} 
+                                    value="option1" 
+                                    onChange={() => {}}
+                                    disabled
+                                />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Multi-Select</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666' }}>
+                            Enable multi-selection to allow users to select multiple options.
+                        </p>
+                        <div className="preview-area">
+                            <SegmentedButtons 
+                                options={fiveOptions} 
+                                value={multiValue} 
+                                onChange={setMultiValue}
+                                multiSelect
+                            />
+                        </div>
+                        <p style={{ marginTop: '1rem', color: '#666', fontSize: '0.875rem' }}>
+                            Selected: {multiValue.join(', ') || 'None'}
+                        </p>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Design Specifications</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Flat</th>
+                                    <th>Relaxed</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Height</td>
+                                    <td>36px</td>
+                                    <td>44px</td>
+                                </tr>
+                                <tr>
+                                    <td>Font Size</td>
+                                    <td>14px</td>
+                                    <td>16px</td>
+                                </tr>
+                                <tr>
+                                    <td>Padding (vertical)</td>
+                                    <td>8px</td>
+                                    <td>12px</td>
+                                </tr>
+                                <tr>
+                                    <td>Padding (horizontal - outer)</td>
+                                    <td>16px</td>
+                                    <td>24px</td>
+                                </tr>
+                                <tr>
+                                    <td>Padding (horizontal - inner)</td>
+                                    <td>12px</td>
+                                    <td>16px</td>
+                                </tr>
+                                <tr>
+                                    <td>Border</td>
+                                    <td colSpan="2">2px solid #CCCCCC (gray-04)</td>
+                                </tr>
+                                <tr>
+                                    <td>Border Radius</td>
+                                    <td colSpan="2">100px (pill shape)</td>
+                                </tr>
+                                <tr>
+                                    <td>Selected Background</td>
+                                    <td colSpan="2">#DBEAFE (Light Blue 300)</td>
+                                </tr>
+                                <tr>
+                                    <td>Unselected Background</td>
+                                    <td colSpan="2">#FFFFFF (white)</td>
+                                </tr>
+                                <tr>
+                                    <td>Selected Text</td>
+                                    <td colSpan="2">#000000 (black), Roboto Medium</td>
+                                </tr>
+                                <tr>
+                                    <td>Unselected Text</td>
+                                    <td colSpan="2">#333333 (gray-07), Roboto Regular</td>
+                                </tr>
+                                <tr>
+                                    <td>Check Icon</td>
+                                    <td>No</td>
+                                    <td>Yes (18×18px)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>options</code></td>
+                                    <td><code>Array&lt;{'{value, label, icon?}'}&gt;</code></td>
+                                    <td>Required</td>
+                                    <td>Array of options to display</td>
+                                </tr>
+                                <tr>
+                                    <td><code>value</code></td>
+                                    <td><code>string | string[]</code></td>
+                                    <td>Required</td>
+                                    <td>Current selected value(s)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>onChange</code></td>
+                                    <td><code>function</code></td>
+                                    <td>Required</td>
+                                    <td>Called when selection changes</td>
+                                </tr>
+                                <tr>
+                                    <td><code>variant</code></td>
+                                    <td><code>'flat' | 'relaxed'</code></td>
+                                    <td><code>'flat'</code></td>
+                                    <td>Size variant (36px vs 44px height)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>multiSelect</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Allow multiple selections</td>
+                                </tr>
+                                <tr>
+                                    <td><code>showCheckIcon</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Show check icon on selected (auto for relaxed)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>disabled</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Disable all segments</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { SegmentedButtons } from '@kipu/design-system';
+
+// Single selection (controlled)
+const [view, setView] = useState('day');
+
+<SegmentedButtons 
+  options={[
+    { value: 'day', label: 'Day' },
+    { value: 'week', label: 'Week' },
+    { value: 'month', label: 'Month' },
+  ]} 
+  value={view} 
+  onChange={setView}
+/>
+
+// Multi-selection
+const [selectedDays, setSelectedDays] = useState(['mon', 'wed']);
+
+<SegmentedButtons 
+  options={dayOptions} 
+  value={selectedDays} 
+  onChange={setSelectedDays}
+  multiSelect
+/>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

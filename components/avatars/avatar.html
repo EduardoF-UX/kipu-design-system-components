@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Avatar Component
+        const Avatar = ({ 
+            src,
+            alt,
+            name,
+            size = 'medium',
+            variant = 'circular',
+            status,
+            onClick,
+        }) => {
+            const sizes = {
+                small: 32,
+                medium: 40,
+                large: 56,
+                xlarge: 80,
+            };
+
+            const avatarSize = sizes[size];
+            
+            const getInitials = (name) => {
+                if (!name) return '';
+                const parts = name.split(' ');
+                if (parts.length >= 2) {
+                    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                }
+                return name.substring(0, 2).toUpperCase();
+            };
+
+            const getBackgroundColor = (name) => {
+                const colors = ['#1565C0', '#059669', '#D97706', '#7C3AED', '#DB2777', '#0891B2'];
+                if (!name) return colors[0];
+                const index = name.charCodeAt(0) % colors.length;
+                return colors[index];
+            };
+
+            const containerStyles = {
+                position: 'relative',
+                display: 'inline-block',
+            };
+
+            const avatarStyles = {
+                width: avatarSize,
+                height: avatarSize,
+                borderRadius: variant === 'circular' ? '50%' : '8px',
+                backgroundColor: src ? 'transparent' : getBackgroundColor(name),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: avatarSize * 0.4,
+                fontWeight: 600,
+                color: 'white',
+                overflow: 'hidden',
+                cursor: onClick ? 'pointer' : 'default',
+            };
+
+            const imageStyles = {
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+            };
+
+            const statusColors = {
+                online: '#22c55e',
+                offline: '#94a3b8',
+                busy: '#ef4444',
+                away: '#f59e0b',
+            };
+
+            const statusStyles = {
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                width: avatarSize * 0.25,
+                height: avatarSize * 0.25,
+                borderRadius: '50%',
+                backgroundColor: statusColors[status] || statusColors.offline,
+                border: '2px solid white',
+            };
+
+            return (
+                <div style={containerStyles} onClick={onClick}>
+                    <div style={avatarStyles}>
+                        {src ? (
+                            <img src={src} alt={alt || name} style={imageStyles} />
+                        ) : (
+                            <span>{getInitials(name)}</span>
+                        )}
+                    </div>
+                    {status && <span style={statusStyles} />}
+                </div>
+            );
+        };
+
+        // Avatar Group Component
+        const AvatarGroup = ({ 
+            avatars,
+            max = 4,
+            size = 'medium',
+        }) => {
+            const sizes = { small: 32, medium: 40, large: 56 };
+            const avatarSize = sizes[size];
+            const displayAvatars = avatars.slice(0, max);
+            const remaining = avatars.length - max;
+
+            return (
+                <div style={{ display: 'flex' }}>
+                    {displayAvatars.map((avatar, index) => (
+                        <div 
+                            key={index} 
+                            style={{ 
+                                marginLeft: index > 0 ? -avatarSize * 0.25 : 0,
+                                border: '2px solid white',
+                                borderRadius: '50%',
+                                zIndex: displayAvatars.length - index,
+                            }}
+                        >
+                            <Avatar {...avatar} size={size} />
+                        </div>
+                    ))}
+                    {remaining > 0 && (
+                        <div style={{
+                            width: avatarSize,
+                            height: avatarSize,
+                            borderRadius: '50%',
+                            backgroundColor: '#e2e8f0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: avatarSize * 0.35,
+                            fontWeight: 600,
+                            color: '#64748b',
+                            marginLeft: -avatarSize * 0.25,
+                            border: '2px solid white',
+                        }}>
+                            +{remaining}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Demo App
+        const App = () => {
+            const sampleAvatars = [
+                { name: 'John Doe' },
+                { name: 'Jane Smith' },
+                { name: 'Bob Johnson' },
+                { name: 'Alice Brown' },
+                { name: 'Charlie Wilson' },
+                { name: 'Diana Lee' },
+            ];
+
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Avatars</span>
+                            <span>/</span>
+                            <span>Avatar</span>
+                        </div>
+                        <h1>Avatar</h1>
+                        <p className="description">
+                            Avatars are used to represent users or entities. They can display images, 
+                            initials, or icons, and can show status indicators.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>Sizes</h2>
+                        <div className="preview-area" style={{ gap: '24px' }}>
+                            <div className="preview-column">
+                                <span className="variant-label">Small (32px)</span>
+                                <Avatar name="John Doe" size="small" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Medium (40px)</span>
+                                <Avatar name="John Doe" size="medium" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Large (56px)</span>
+                                <Avatar name="John Doe" size="large" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">XLarge (80px)</span>
+                                <Avatar name="John Doe" size="xlarge" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Variants</h2>
+                        <div className="preview-area" style={{ gap: '24px' }}>
+                            <div className="preview-column">
+                                <span className="variant-label">Circular</span>
+                                <Avatar name="John Doe" size="large" variant="circular" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Rounded</span>
+                                <Avatar name="John Doe" size="large" variant="rounded" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>With Image</h2>
+                        <div className="preview-area" style={{ gap: '24px' }}>
+                            <Avatar 
+                                src="https://i.pravatar.cc/150?img=1" 
+                                name="John Doe" 
+                                size="small"
+                            />
+                            <Avatar 
+                                src="https://i.pravatar.cc/150?img=2" 
+                                name="Jane Smith" 
+                                size="medium"
+                            />
+                            <Avatar 
+                                src="https://i.pravatar.cc/150?img=3" 
+                                name="Bob Johnson" 
+                                size="large"
+                            />
+                            <Avatar 
+                                src="https://i.pravatar.cc/150?img=4" 
+                                name="Alice Brown" 
+                                size="xlarge"
+                            />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Initials (Fallback)</h2>
+                        <div className="preview-area" style={{ gap: '16px' }}>
+                            <Avatar name="John Doe" size="large" />
+                            <Avatar name="Jane Smith" size="large" />
+                            <Avatar name="Bob Johnson" size="large" />
+                            <Avatar name="Alice Brown" size="large" />
+                            <Avatar name="Charlie Wilson" size="large" />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>With Status</h2>
+                        <div className="preview-area" style={{ gap: '24px' }}>
+                            <div className="preview-column">
+                                <span className="variant-label">Online</span>
+                                <Avatar name="John Doe" size="large" status="online" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Offline</span>
+                                <Avatar name="Jane Smith" size="large" status="offline" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Busy</span>
+                                <Avatar name="Bob Johnson" size="large" status="busy" />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Away</span>
+                                <Avatar name="Alice Brown" size="large" status="away" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Avatar Group</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '24px' }}>
+                            <div className="preview-column">
+                                <span className="variant-label">Default (max 4)</span>
+                                <AvatarGroup avatars={sampleAvatars} />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Max 3</span>
+                                <AvatarGroup avatars={sampleAvatars} max={3} />
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Large size</span>
+                                <AvatarGroup avatars={sampleAvatars} max={4} size="large" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>src</code></td>
+                                    <td><code>string</code></td>
+                                    <td>-</td>
+                                    <td>Image URL</td>
+                                </tr>
+                                <tr>
+                                    <td><code>name</code></td>
+                                    <td><code>string</code></td>
+                                    <td>-</td>
+                                    <td>Name for initials fallback</td>
+                                </tr>
+                                <tr>
+                                    <td><code>size</code></td>
+                                    <td><code>'small' | 'medium' | 'large' | 'xlarge'</code></td>
+                                    <td><code>'medium'</code></td>
+                                    <td>Avatar size</td>
+                                </tr>
+                                <tr>
+                                    <td><code>variant</code></td>
+                                    <td><code>'circular' | 'rounded'</code></td>
+                                    <td><code>'circular'</code></td>
+                                    <td>Shape variant</td>
+                                </tr>
+                                <tr>
+                                    <td><code>status</code></td>
+                                    <td><code>'online' | 'offline' | 'busy' | 'away'</code></td>
+                                    <td>-</td>
+                                    <td>Status indicator</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { Avatar, AvatarGroup } from '@kipu/design-system';
+
+// With image
+<Avatar src="/user.jpg" name="John Doe" size="large" />
+
+// Initials fallback
+<Avatar name="John Doe" size="medium" />
+
+// With status
+<Avatar name="John Doe" status="online" />
+
+// Avatar group
+<AvatarGroup 
+  avatars={[
+    { name: 'John Doe' },
+    { name: 'Jane Smith', src: '/jane.jpg' },
+    { name: 'Bob Johnson' },
+  ]}
+  max={3}
+/>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

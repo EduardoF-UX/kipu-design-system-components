@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        // Kipu Design System Colors (from Figma)
+        const colors = {
+            blue500: '#1565C0',
+            blue700: '#0F4888',
+            lightBlue100: '#EFF5FF',
+            purple500: '#6C18C9',   // Purple/purple-500-main (search icon focus)
+            white: '#FFFFFF',
+            gray02: '#F0F0F0',
+            gray05: '#999999',
+            gray06: '#666666',
+            black: '#000000',
+        };
+
+        // Search Icon (24x24)
+        const SearchIcon = ({ size = 24, color = colors.gray05 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+        );
+
+        // Clear/Cancel Icon (24x24)
+        const ClearIcon = ({ size = 24, color = colors.gray05 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={{ cursor: 'pointer' }}>
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+        );
+
+        // Search Main Component - Primary search with pill shape
+        // Figma specs: Height 48px, Border-radius 120px, Border 1px #999
+        const SearchMain = ({ 
+            value,
+            onChange,
+            placeholder = 'Search',
+            disabled = false,
+            onFocus,
+            onBlur,
+            width = '240px',
+        }) => {
+            const [isFocused, setIsFocused] = useState(false);
+
+            const containerStyles = {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                height: '48px',
+                width: width,
+                paddingLeft: '24px',
+                paddingRight: '16px',
+                paddingTop: '12px',
+                paddingBottom: '12px',
+                background: colors.white,
+                border: isFocused ? `2px solid ${colors.blue500}` : `1px solid ${colors.gray05}`,
+                borderRadius: '120px',
+                boxSizing: 'border-box',
+                boxShadow: isFocused ? '0px 2px 4px rgba(0, 0, 0, 0.16)' : 'none',
+                transition: 'all 0.2s ease',
+                opacity: disabled ? 0.5 : 1,
+                cursor: disabled ? 'not-allowed' : 'text',
+            };
+
+            const inputStyles = {
+                flex: 1,
+                border: 'none',
+                outline: 'none',
+                background: 'transparent',
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400,
+                fontSize: '16px',
+                lineHeight: '20px',
+                color: value ? colors.black : colors.gray05,
+                cursor: disabled ? 'not-allowed' : 'text',
+                minWidth: 0,
+            };
+
+            const handleFocus = () => {
+                setIsFocused(true);
+                onFocus?.();
+            };
+
+            const handleBlur = () => {
+                setIsFocused(false);
+                onBlur?.();
+            };
+
+            return (
+                <div style={containerStyles} onClick={() => !disabled && document.getElementById('search-main')?.focus()}>
+                    <SearchIcon color={isFocused ? colors.purple500 : colors.gray05} />
+                    <input
+                        id="search-main"
+                        type="text"
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        placeholder={placeholder}
+                        disabled={disabled}
+                        style={inputStyles}
+                        onFocus={handleFocus}
+                        onBlur={handleBlur}
+                    />
+                    {value && (
+                        <div onClick={(e) => { e.stopPropagation(); onChange(''); }}>
+                            <ClearIcon color={colors.gray05} />
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Flat Search Component - Compact search variant
+        // Figma specs: Height 40px, Border-radius 120px, Font 14px
+        const FlatSearch = ({ 
+            value,
+            onChange,
+            placeholder = 'Search',
+            disabled = false,
+            width = '240px',
+        }) => {
+            const [isFocused, setIsFocused] = useState(false);
+
+            const containerStyles = {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                height: '40px',
+                width: width,
+                paddingLeft: '24px',
+                paddingRight: '16px',
+                paddingTop: '8px',
+                paddingBottom: '8px',
+                background: colors.white,
+                border: isFocused ? `2px solid ${colors.blue500}` : `1px solid ${colors.gray05}`,
+                borderRadius: '120px',
+                boxSizing: 'border-box',
+                boxShadow: isFocused ? '0px 2px 4px rgba(0, 0, 0, 0.16)' : 'none',
+                transition: 'all 0.2s ease',
+                opacity: disabled ? 0.5 : 1,
+                cursor: disabled ? 'not-allowed' : 'text',
+            };
+
+            const inputStyles = {
+                flex: 1,
+                border: 'none',
+                outline: 'none',
+                background: 'transparent',
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400,
+                fontSize: '14px',
+                lineHeight: '20px',
+                color: value ? colors.black : colors.gray05,
+                cursor: disabled ? 'not-allowed' : 'text',
+                minWidth: 0,
+            };
+
+            return (
+                <div style={containerStyles}>
+                    <SearchIcon color={isFocused ? colors.purple500 : colors.gray05} />
+                    <input
+                        type="text"
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        placeholder={placeholder}
+                        disabled={disabled}
+                        style={inputStyles}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                    />
+                    {value && (
+                        <div onClick={() => onChange('')} style={{ cursor: 'pointer' }}>
+                            <ClearIcon size={20} color={colors.gray05} />
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Search Typeahead Component - With dropdown results
+        // Figma specs: Border 2px #1565C0, Border-radius 24px, Shadow
+        const SearchTypeahead = ({ 
+            value,
+            onChange,
+            placeholder = 'Search',
+            results = [],
+            onResultClick,
+            onViewAll,
+            showResults = false,
+            highlightMatch = true,
+            width = '320px',
+        }) => {
+            const [isFocused, setIsFocused] = useState(false);
+            const inputRef = useRef(null);
+
+            const containerStyles = {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                width: width,
+                paddingTop: '8px',
+                paddingBottom: '16px',
+                paddingLeft: '16px',
+                paddingRight: '16px',
+                background: colors.white,
+                border: `2px solid ${colors.blue500}`,
+                borderRadius: '24px',
+                boxShadow: '0px 2px 44px 0px rgba(0, 0, 0, 0.1)',
+                boxSizing: 'border-box',
+            };
+
+            const searchRowStyles = {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                paddingTop: '8px',
+                paddingBottom: '8px',
+                borderBottom: `1px solid ${colors.gray02}`,
+            };
+
+            const inputStyles = {
+                flex: 1,
+                border: 'none',
+                outline: 'none',
+                background: 'transparent',
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400,
+                fontSize: '16px',
+                lineHeight: '20px',
+                color: colors.black,
+                minWidth: 0,
+            };
+
+            const resultItemStyles = {
+                display: 'flex',
+                alignItems: 'center',
+                padding: '8px 12px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                transition: 'background 0.15s ease',
+            };
+
+            const resultTextStyles = {
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400,
+                fontSize: '16px',
+                lineHeight: '20px',
+                color: colors.black,
+            };
+
+            const buttonStyles = {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '38px',
+                width: '100%',
+                background: 'transparent',
+                border: 'none',
+                borderRadius: '100px',
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 500,
+                fontSize: '14px',
+                textTransform: 'uppercase',
+                color: colors.blue500,
+                cursor: 'pointer',
+            };
+
+            const highlightText = (text, query) => {
+                if (!query || !highlightMatch) return text;
+                const parts = text.split(new RegExp(`(${query})`, 'gi'));
+                return parts.map((part, i) => 
+                    part.toLowerCase() === query.toLowerCase() 
+                        ? <span key={i} style={{ color: colors.blue500 }}>{part}</span>
+                        : part
+                );
+            };
+
+            return (
+                <div style={containerStyles}>
+                    <div style={searchRowStyles}>
+                        <SearchIcon color={colors.blue500} />
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            value={value}
+                            onChange={(e) => onChange(e.target.value)}
+                            placeholder={placeholder}
+                            style={inputStyles}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
+                        />
+                        {value && (
+                            <div onClick={() => { onChange(''); inputRef.current?.focus(); }} style={{ cursor: 'pointer' }}>
+                                <ClearIcon color={colors.gray05} />
+                            </div>
+                        )}
+                    </div>
+                    
+                    {results.length > 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            {results.map((result, index) => (
+                                <div 
+                                    key={index}
+                                    style={resultItemStyles}
+                                    onClick={() => onResultClick?.(result)}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = colors.lightBlue100}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                >
+                                    <span style={resultTextStyles}>
+                                        {highlightText(result, value)}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    
+                    {onViewAll && (
+                        <button style={buttonStyles} onClick={onViewAll}>
+                            Full Search Results
+                        </button>
+                    )}
+                </div>
+            );
+        };
+
+        // Demo App
+        const App = () => {
+            const [searchMain, setSearchMain] = useState('');
+            const [flatSearch, setFlatSearch] = useState('');
+            const [typeahead, setTypeahead] = useState('Health');
+            const [showTypeahead, setShowTypeahead] = useState(true);
+
+            const mockResults = [
+                'Healthcare Service',
+                'Professional Health',
+                'Health Services',
+                'Healthcare Insurance',
+                'Healthy Choices',
+            ].filter(item => 
+                typeahead && item.toLowerCase().includes(typeahead.toLowerCase())
+            );
+
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Forms</span>
+                            <span>/</span>
+                            <span>Search</span>
+                        </div>
+                        <h1>Search</h1>
+                        <p className="description">
+                            Search inputs allow users to search content quickly. The Kipu Design System 
+                            includes two main variants: Search Main (primary) and Flat Search (compact), 
+                            plus a typeahead dropdown for real-time suggestions.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>Search Main (Primary)</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                            Height: 48px • Border-radius: 120px • Border: 1px #999 • Icon: 24×24px • Font: Roboto 16px
+                        </p>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '1.5rem', alignItems: 'flex-start' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span className="variant-label">Default</span>
+                                    <div style={{ marginTop: '8px' }}>
+                                        <SearchMain 
+                                            value={searchMain}
+                                            onChange={setSearchMain}
+                                            placeholder="Search"
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span className="variant-label">Disabled</span>
+                                    <div style={{ marginTop: '8px' }}>
+                                        <SearchMain 
+                                            value=""
+                                            onChange={() => {}}
+                                            placeholder="Search"
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Flat Search (Compact)</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                            Height: 40px • Border-radius: 120px • Border: 1px #999 • Font: Roboto 14px
+                        </p>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '1.5rem', alignItems: 'flex-start' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span className="variant-label">Default</span>
+                                    <div style={{ marginTop: '8px' }}>
+                                        <FlatSearch 
+                                            value={flatSearch}
+                                            onChange={setFlatSearch}
+                                            placeholder="Search"
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span className="variant-label">With Value</span>
+                                    <div style={{ marginTop: '8px' }}>
+                                        <FlatSearch 
+                                            value="Patient name"
+                                            onChange={() => {}}
+                                            placeholder="Search"
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span className="variant-label">Disabled</span>
+                                    <div style={{ marginTop: '8px' }}>
+                                        <FlatSearch 
+                                            value=""
+                                            onChange={() => {}}
+                                            placeholder="Search"
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Search Typeahead</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                            Border: 2px #1565C0 • Border-radius: 24px • Hover: #EFF5FF (Light Blue 100) • Match highlight: Blue
+                        </p>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '1.5rem', alignItems: 'flex-start' }}>
+                            <SearchTypeahead 
+                                value={typeahead}
+                                onChange={setTypeahead}
+                                placeholder="Search patients..."
+                                results={mockResults}
+                                onResultClick={(result) => {
+                                    setTypeahead(result);
+                                    alert(`Selected: ${result}`);
+                                }}
+                                onViewAll={() => alert('View all results clicked')}
+                                highlightMatch
+                            />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Search Sizes Comparison</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span style={{ width: '120px', fontSize: '14px', color: '#666' }}>Search Main (48px)</span>
+                                <SearchMain value="" onChange={() => {}} width="280px" />
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span style={{ width: '120px', fontSize: '14px', color: '#666' }}>Flat Search (40px)</span>
+                                <FlatSearch value="" onChange={() => {}} width="280px" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Full Width Example</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', width: '100%' }}>
+                            <SearchMain 
+                                value=""
+                                onChange={() => {}}
+                                placeholder="Search patients, records, appointments..."
+                                width="100%"
+                            />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Design Specifications</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Search Main</th>
+                                    <th>Flat Search</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Height</td>
+                                    <td><code>48px</code></td>
+                                    <td><code>40px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Border</td>
+                                    <td><code>1px solid #999999</code></td>
+                                    <td><code>1px solid #999999</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Border (focused)</td>
+                                    <td><code>1px solid #1565C0</code></td>
+                                    <td><code>1px solid #1565C0</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Border Radius</td>
+                                    <td><code>120px</code> (pill)</td>
+                                    <td><code>120px</code> (pill)</td>
+                                </tr>
+                                <tr>
+                                    <td>Padding</td>
+                                    <td><code>12px 16px 12px 24px</code></td>
+                                    <td><code>8px 16px 8px 24px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Font Size</td>
+                                    <td><code>16px</code></td>
+                                    <td><code>14px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Icon Size</td>
+                                    <td><code>24×24px</code></td>
+                                    <td><code>24×24px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Placeholder Color</td>
+                                    <td><code>#999999</code></td>
+                                    <td><code>#999999</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>value</code></td>
+                                    <td><code>string</code></td>
+                                    <td>Required</td>
+                                    <td>Search input value</td>
+                                </tr>
+                                <tr>
+                                    <td><code>onChange</code></td>
+                                    <td><code>function</code></td>
+                                    <td>Required</td>
+                                    <td>Called when value changes</td>
+                                </tr>
+                                <tr>
+                                    <td><code>placeholder</code></td>
+                                    <td><code>string</code></td>
+                                    <td><code>'Search'</code></td>
+                                    <td>Placeholder text</td>
+                                </tr>
+                                <tr>
+                                    <td><code>disabled</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Disable the input</td>
+                                </tr>
+                                <tr>
+                                    <td><code>width</code></td>
+                                    <td><code>string</code></td>
+                                    <td><code>'240px'</code></td>
+                                    <td>Input width</td>
+                                </tr>
+                                <tr>
+                                    <td><code>results</code></td>
+                                    <td><code>string[]</code></td>
+                                    <td><code>[]</code></td>
+                                    <td>Typeahead results (SearchTypeahead only)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>onResultClick</code></td>
+                                    <td><code>function</code></td>
+                                    <td>-</td>
+                                    <td>Called when result clicked</td>
+                                </tr>
+                                <tr>
+                                    <td><code>highlightMatch</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>true</code></td>
+                                    <td>Highlight matching text</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { SearchMain, FlatSearch, SearchTypeahead } from '@kipu/design-system';
+
+// Basic search
+const [query, setQuery] = useState('');
+
+<SearchMain 
+  value={query}
+  onChange={setQuery}
+  placeholder="Search patients..."
+/>
+
+// Compact search
+<FlatSearch 
+  value={query}
+  onChange={setQuery}
+  placeholder="Filter..."
+/>
+
+// With typeahead dropdown
+const [results, setResults] = useState([]);
+
+<SearchTypeahead 
+  value={query}
+  onChange={(v) => {
+    setQuery(v);
+    fetchResults(v).then(setResults);
+  }}
+  results={results}
+  onResultClick={(result) => navigate(result.url)}
+  onViewAll={() => navigate('/search?q=' + query)}
+  highlightMatch
+/>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

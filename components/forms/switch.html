@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Switch - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Kipu Design System Colors
+        const colors = {
+            blue500: '#1565C0',
+            blue700: '#0F4888',
+            lightBlue500: '#CADFFE',
+            white: '#FFFFFF',
+            gray04: '#CCCCCC',
+            gray05: '#999999',
+            gray06: '#666666',
+        };
+
+        // Switch Component - Matching Figma Design System
+        const Switch = ({ 
+            checked = false,
+            onChange,
+            label,
+            labelPosition = 'right',
+            disabled = false,
+        }) => {
+            const [isHovered, setIsHovered] = useState(false);
+
+            // Figma specs: Container 48x32, Track 30x14, Thumb 22x22
+            const containerStyles = {
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '12px',
+                flexDirection: labelPosition === 'left' ? 'row-reverse' : 'row',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                opacity: disabled ? 0.5 : 1,
+            };
+
+            // Switch track container (48x32)
+            const switchContainerStyles = {
+                position: 'relative',
+                width: '48px',
+                height: '32px',
+            };
+
+            // Track (30x14, border-radius 7px)
+            const trackStyles = {
+                position: 'absolute',
+                width: '30px',
+                height: '14px',
+                borderRadius: '7px',
+                top: '9px',
+                left: checked ? '9px' : '9px',
+                background: checked ? colors.lightBlue500 : colors.gray04,
+                transition: 'background 0.2s ease',
+            };
+
+            // Thumb (22x22 with shadow)
+            const thumbStyles = {
+                position: 'absolute',
+                width: '22px',
+                height: '22px',
+                borderRadius: '50%',
+                top: '5px',
+                left: checked ? '19px' : '7px',
+                background: checked ? colors.blue500 : colors.white,
+                boxShadow: checked 
+                    ? '0px 2px 4px rgba(0, 0, 0, 0.2), 0px 4px 8px rgba(21, 101, 192, 0.3)'
+                    : '0px 2px 4px rgba(0, 0, 0, 0.2), 0px 1px 2px rgba(0, 0, 0, 0.1)',
+                transition: 'left 0.2s ease, background 0.2s ease, box-shadow 0.2s ease',
+                transform: isHovered && !disabled ? 'scale(1.1)' : 'scale(1)',
+            };
+
+            // Hover ring effect
+            const hoverRingStyles = {
+                position: 'absolute',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                top: '0px',
+                left: checked ? '14px' : '2px',
+                background: isHovered && !disabled 
+                    ? (checked ? 'rgba(21, 101, 192, 0.12)' : 'rgba(0, 0, 0, 0.08)')
+                    : 'transparent',
+                transition: 'left 0.2s ease, background 0.2s ease',
+                pointerEvents: 'none',
+            };
+
+            const labelStyles = {
+                fontFamily: "'Roboto', sans-serif",
+                fontSize: '16px',
+                fontWeight: 400,
+                lineHeight: '20px',
+                color: colors.gray06,
+            };
+
+            const handleClick = () => {
+                if (!disabled && onChange) {
+                    onChange(!checked);
+                }
+            };
+
+            return (
+                <label 
+                    style={containerStyles} 
+                    onClick={handleClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    <div style={switchContainerStyles}>
+                        <div style={hoverRingStyles} />
+                        <div style={trackStyles} />
+                        <div style={thumbStyles} />
+                    </div>
+                    {label && <span style={labelStyles}>{label}</span>}
+                </label>
+            );
+        };
+
+        // Demo App
+        const App = () => {
+            const [values, setValues] = useState({
+                basic: false,
+                notifications: true,
+                darkMode: false,
+                autoSave: true,
+            });
+
+            const updateValue = (key) => {
+                setValues(prev => ({ ...prev, [key]: !prev[key] }));
+            };
+
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Forms</span>
+                            <span>/</span>
+                            <span>Switch</span>
+                        </div>
+                        <h1>Switch</h1>
+                        <p className="description">
+                            Switches are the preferred way to adjust settings. They're used to control 
+                            binary options – think On/Off or True/False.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>States</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                            Container: 48×32px • Track: 30×14px (#CADFFE on, #CCC off) • Thumb: 22×22px
+                        </p>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '2rem', alignItems: 'flex-start' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '48px' }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span className="variant-label">Off</span>
+                                    <div style={{ marginTop: '8px' }}>
+                                        <Switch checked={false} onChange={() => {}} />
+                                    </div>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span className="variant-label">On</span>
+                                    <div style={{ marginTop: '8px' }}>
+                                        <Switch checked={true} onChange={() => {}} />
+                                    </div>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span className="variant-label">Disabled Off</span>
+                                    <div style={{ marginTop: '8px' }}>
+                                        <Switch checked={false} disabled onChange={() => {}} />
+                                    </div>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span className="variant-label">Disabled On</span>
+                                    <div style={{ marginTop: '8px' }}>
+                                        <Switch checked={true} disabled onChange={() => {}} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>With Labels</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '1.5rem', alignItems: 'flex-start' }}>
+                            <Switch label="Label on right (default)" checked={false} onChange={() => {}} labelPosition="right" />
+                            <Switch label="Label on left" checked={true} onChange={() => {}} labelPosition="left" />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Interactive Example</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <Switch 
+                                label="Click to toggle"
+                                checked={values.basic}
+                                onChange={() => updateValue('basic')}
+                            />
+                            <span style={{ color: '#666', fontSize: '14px', marginTop: '8px' }}>
+                                State: {values.basic ? 'On' : 'Off'}
+                            </span>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Settings Example</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '0', alignItems: 'stretch' }}>
+                            <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                padding: '16px',
+                                borderBottom: '1px solid #e2e8f0'
+                            }}>
+                                <div>
+                                    <div style={{ fontWeight: 500, fontFamily: "'Roboto', sans-serif" }}>Notifications</div>
+                                    <div style={{ fontSize: '14px', color: '#666', fontFamily: "'Roboto', sans-serif" }}>Receive push notifications</div>
+                                </div>
+                                <Switch 
+                                    checked={values.notifications}
+                                    onChange={() => updateValue('notifications')}
+                                />
+                            </div>
+                            <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                padding: '16px',
+                                borderBottom: '1px solid #e2e8f0'
+                            }}>
+                                <div>
+                                    <div style={{ fontWeight: 500, fontFamily: "'Roboto', sans-serif" }}>Dark Mode</div>
+                                    <div style={{ fontSize: '14px', color: '#666', fontFamily: "'Roboto', sans-serif" }}>Use dark theme</div>
+                                </div>
+                                <Switch 
+                                    checked={values.darkMode}
+                                    onChange={() => updateValue('darkMode')}
+                                />
+                            </div>
+                            <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                padding: '16px'
+                            }}>
+                                <div>
+                                    <div style={{ fontWeight: 500, fontFamily: "'Roboto', sans-serif" }}>Auto-save</div>
+                                    <div style={{ fontSize: '14px', color: '#666', fontFamily: "'Roboto', sans-serif" }}>Automatically save changes</div>
+                                </div>
+                                <Switch 
+                                    checked={values.autoSave}
+                                    onChange={() => updateValue('autoSave')}
+                                />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Design Specifications</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Container Size</td>
+                                    <td><code>48×32px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Track Size</td>
+                                    <td><code>30×14px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Track Border Radius</td>
+                                    <td><code>7px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Track Color (On)</td>
+                                    <td><code>#CADFFE</code> (Light Blue 500)</td>
+                                </tr>
+                                <tr>
+                                    <td>Track Color (Off)</td>
+                                    <td><code>#CCCCCC</code> (Gray 04)</td>
+                                </tr>
+                                <tr>
+                                    <td>Thumb Size</td>
+                                    <td><code>22×22px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Thumb Color (On)</td>
+                                    <td><code>#1565C0</code> (Blue 500)</td>
+                                </tr>
+                                <tr>
+                                    <td>Thumb Color (Off)</td>
+                                    <td><code>#FFFFFF</code> (White)</td>
+                                </tr>
+                                <tr>
+                                    <td>Thumb Position (On)</td>
+                                    <td><code>left: 19px, top: 5px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Thumb Position (Off)</td>
+                                    <td><code>left: 7px, top: 5px</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>checked</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Whether switch is on</td>
+                                </tr>
+                                <tr>
+                                    <td><code>onChange</code></td>
+                                    <td><code>function</code></td>
+                                    <td>-</td>
+                                    <td>Called when state changes</td>
+                                </tr>
+                                <tr>
+                                    <td><code>label</code></td>
+                                    <td><code>string</code></td>
+                                    <td>-</td>
+                                    <td>Label text</td>
+                                </tr>
+                                <tr>
+                                    <td><code>labelPosition</code></td>
+                                    <td><code>'left' | 'right'</code></td>
+                                    <td><code>'right'</code></td>
+                                    <td>Position of label</td>
+                                </tr>
+                                <tr>
+                                    <td><code>disabled</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Disable the switch</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { Switch } from '@kipu/design-system';
+
+// Basic usage
+const [enabled, setEnabled] = useState(false);
+
+<Switch 
+  checked={enabled}
+  onChange={setEnabled}
+/>
+
+// With label
+<Switch 
+  label="Enable notifications"
+  checked={enabled}
+  onChange={setEnabled}
+/>
+
+// In a settings list
+<div className="settings-item">
+  <div className="settings-info">
+    <span>Dark Mode</span>
+    <span>Use dark theme</span>
+  </div>
+  <Switch 
+    checked={darkMode}
+    onChange={setDarkMode}
+  />
+</div>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

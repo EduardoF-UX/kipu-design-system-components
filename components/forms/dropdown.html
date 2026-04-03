@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropdown - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        // Kipu Design System Colors (from Figma)
+        const colors = {
+            blue500: '#1565C0',
+            blue700: '#0F4888',
+            lightBlue100: '#EFF5FF',
+            white: '#FFFFFF',
+            gray04: '#CCCCCC',
+            gray05: '#999999',
+            gray06: '#666666',
+            black: '#000000',
+            error: '#E50000',
+        };
+
+        // Dropdown Arrow Icon (18x18)
+        const ChevronIcon = ({ isOpen, color = colors.gray06 }) => (
+            <svg 
+                width="18" 
+                height="18" 
+                viewBox="0 0 24 24" 
+                fill={color}
+                style={{ 
+                    transform: isOpen ? 'rotate(180deg)' : 'none', 
+                    transition: 'transform 0.2s ease' 
+                }}
+            >
+                <path d="M7 10l5 5 5-5H7z"/>
+            </svg>
+        );
+
+        // Dropdown Component - Matching Figma Design System
+        // Figma specs: Border 1px #CCC, Border-radius 4px, Padding 12px
+        const Dropdown = ({ 
+            label,
+            value,
+            onChange,
+            options,
+            placeholder = 'Select Option',
+            disabled = false,
+            error = false,
+            errorText,
+            helperText,
+            fullWidth = false,
+            required = false,
+            searchable = false,
+        }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const [searchQuery, setSearchQuery] = useState('');
+            const containerRef = useRef(null);
+
+            const selectedOption = options.find(opt => opt.value === value);
+
+            useEffect(() => {
+                const handleClickOutside = (e) => {
+                    if (containerRef.current && !containerRef.current.contains(e.target)) {
+                        setIsOpen(false);
+                        setSearchQuery('');
+                    }
+                };
+                document.addEventListener('mousedown', handleClickOutside);
+                return () => document.removeEventListener('mousedown', handleClickOutside);
+            }, []);
+
+            const filteredOptions = searchable && searchQuery
+                ? options.filter(opt => opt.label.toLowerCase().includes(searchQuery.toLowerCase()))
+                : options;
+
+            // Container styles
+            const containerStyles = {
+                position: 'relative',
+                width: fullWidth ? '100%' : '280px',
+            };
+
+            // Trigger/Field styles from Figma
+            // Default: 1px solid #CCCCCC, Open: 1px solid #1565C0
+            const triggerStyles = {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '8px',
+                height: '46px',
+                paddingLeft: '12px',
+                paddingRight: '8px',
+                paddingTop: '12px',
+                paddingBottom: '12px',
+                background: disabled ? '#F0F0F0' : colors.white,
+                border: `1px solid ${error ? colors.error : (isOpen ? colors.blue500 : colors.gray04)}`,
+                borderRadius: '4px',
+                boxShadow: isOpen ? '0px 2px 4px rgba(0, 0, 0, 0.16)' : 'none',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                boxSizing: 'border-box',
+            };
+
+            // Selected value / placeholder text styles
+            const valueStyles = {
+                flex: 1,
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400,
+                fontSize: '16px',
+                lineHeight: '20px',
+                color: selectedOption ? (isOpen ? colors.blue500 : colors.black) : colors.gray05,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+            };
+
+            // Label styles from Figma
+            // Position: absolute, top positioned above border, left 12px
+            // Color: #666666 default, #1565C0 focused
+            const labelStyles = {
+                position: 'absolute',
+                top: '-6px',
+                left: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '2px',
+                height: '14px',
+                paddingLeft: '2px',
+                paddingRight: '2px',
+                background: disabled ? '#F0F0F0' : colors.white,
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400,
+                fontSize: '12px',
+                lineHeight: '14px',
+                color: error ? colors.error : (isOpen ? colors.blue500 : colors.gray06),
+                whiteSpace: 'nowrap',
+                transition: 'color 0.2s ease',
+            };
+
+            // Dropdown panel styles from Figma
+            // Shadow: 0px 2px 4px rgba(0, 0, 0, 0.16)
+            const dropdownStyles = {
+                position: 'absolute',
+                top: 'calc(100% + 4px)',
+                left: 0,
+                right: 0,
+                background: colors.white,
+                border: `1px solid ${colors.blue500}`,
+                borderRadius: '4px',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.16)',
+                zIndex: 1000,
+                maxHeight: '240px',
+                overflowY: 'auto',
+            };
+
+            // Option item styles from Figma
+            // Padding: 12px horizontal, 8px vertical
+            // Hover: #EFF5FF background, #0F4888 text
+            const getOptionStyles = (isSelected) => ({
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 12px',
+                cursor: 'pointer',
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400,
+                fontSize: '14px',
+                lineHeight: '20px',
+                background: isSelected ? colors.lightBlue100 : colors.white,
+                color: isSelected ? colors.blue700 : colors.black,
+                borderRadius: '4px',
+                transition: 'background 0.15s ease, color 0.15s ease',
+            });
+
+            // Helper text styles
+            const helperStyles = {
+                display: 'block',
+                marginTop: '4px',
+                paddingLeft: '12px',
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400,
+                fontSize: '12px',
+                lineHeight: '14px',
+                color: error ? colors.error : colors.gray06,
+            };
+
+            return (
+                <div ref={containerRef} style={containerStyles}>
+                    {label && (
+                        <div style={labelStyles}>
+                            <span>{label}</span>
+                            {required && <span>*</span>}
+                        </div>
+                    )}
+                    
+                    <div 
+                        style={triggerStyles}
+                        onClick={() => !disabled && setIsOpen(!isOpen)}
+                    >
+                        <span style={valueStyles}>
+                            {selectedOption ? selectedOption.label : placeholder}
+                        </span>
+                        <ChevronIcon 
+                            isOpen={isOpen} 
+                            color={isOpen ? colors.blue500 : colors.gray06} 
+                        />
+                    </div>
+                    
+                    {isOpen && (
+                        <div style={dropdownStyles}>
+                            {searchable && (
+                                <div style={{ 
+                                    padding: '8px', 
+                                    borderBottom: `1px solid ${colors.gray04}` 
+                                }}>
+                                    <input
+                                        type="text"
+                                        placeholder="Search..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        style={{
+                                            width: '100%',
+                                            padding: '8px 12px',
+                                            border: `1px solid ${colors.gray04}`,
+                                            borderRadius: '4px',
+                                            fontFamily: "'Roboto', sans-serif",
+                                            fontSize: '14px',
+                                            lineHeight: '20px',
+                                            outline: 'none',
+                                            boxSizing: 'border-box',
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                        autoFocus
+                                    />
+                                </div>
+                            )}
+                            <div style={{ padding: '8px' }}>
+                                {filteredOptions.map(option => (
+                                    <div
+                                        key={option.value}
+                                        style={getOptionStyles(value === option.value)}
+                                        onClick={() => {
+                                            onChange(option.value);
+                                            setIsOpen(false);
+                                            setSearchQuery('');
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (value !== option.value) {
+                                                e.currentTarget.style.background = colors.lightBlue100;
+                                                e.currentTarget.style.color = colors.blue700;
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            if (value !== option.value) {
+                                                e.currentTarget.style.background = colors.white;
+                                                e.currentTarget.style.color = colors.black;
+                                            }
+                                        }}
+                                    >
+                                        {option.label}
+                                    </div>
+                                ))}
+                                {filteredOptions.length === 0 && (
+                                    <div style={{ 
+                                        padding: '8px 12px', 
+                                        color: colors.gray05, 
+                                        textAlign: 'center',
+                                        fontFamily: "'Roboto', sans-serif",
+                                        fontSize: '14px',
+                                    }}>
+                                        No options found
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                    
+                    {(helperText || errorText) && (
+                        <span style={helperStyles}>
+                            {error ? errorText : helperText}
+                        </span>
+                    )}
+                </div>
+            );
+        };
+
+        // Demo App
+        const App = () => {
+            const [values, setValues] = useState({
+                basic: '',
+                prefilled: 'option2',
+                searchable: '',
+                required: '',
+            });
+
+            const basicOptions = [
+                { value: 'option1', label: 'State License' },
+                { value: 'option2', label: 'Medicare PTAN' },
+                { value: 'option3', label: 'Medicare PIN' },
+            ];
+
+            const countryOptions = [
+                { value: 'us', label: 'United States' },
+                { value: 'ca', label: 'Canada' },
+                { value: 'mx', label: 'Mexico' },
+                { value: 'uk', label: 'United Kingdom' },
+                { value: 'de', label: 'Germany' },
+                { value: 'fr', label: 'France' },
+                { value: 'es', label: 'Spain' },
+                { value: 'it', label: 'Italy' },
+            ];
+
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Forms</span>
+                            <span>/</span>
+                            <span>Dropdown</span>
+                        </div>
+                        <h1>Dropdown</h1>
+                        <p className="description">
+                            Dropdowns allow users to select a single option from a list. They're useful 
+                            when you have a large number of options that would take up too much space as 
+                            radio buttons.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>Basic Examples</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                            Height: 46px • Border: 1px #CCC (default), 1px #1565C0 (open) • Border-radius: 4px
+                        </p>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '2rem', alignItems: 'flex-start', paddingTop: '1rem' }}>
+                            <Dropdown
+                                label="Label"
+                                options={basicOptions}
+                                value={values.basic}
+                                onChange={(v) => setValues(prev => ({ ...prev, basic: v }))}
+                                required
+                            />
+                            <Dropdown
+                                label="Pre-selected"
+                                options={basicOptions}
+                                value={values.prefilled}
+                                onChange={(v) => setValues(prev => ({ ...prev, prefilled: v }))}
+                            />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>States</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', gap: '2rem', alignItems: 'flex-start', paddingTop: '1rem' }}>
+                            <Dropdown
+                                label="With helper text"
+                                options={basicOptions}
+                                value=""
+                                onChange={() => {}}
+                                helperText="Select your preferred option"
+                            />
+                            <Dropdown
+                                label="Error state"
+                                options={basicOptions}
+                                value=""
+                                onChange={() => {}}
+                                error
+                                errorText="Please select an option"
+                            />
+                            <Dropdown
+                                label="Disabled"
+                                options={basicOptions}
+                                value="option1"
+                                onChange={() => {}}
+                                disabled
+                            />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Searchable Dropdown</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                            Enable search to filter options in large lists.
+                        </p>
+                        <div className="preview-area" style={{ flexDirection: 'column', alignItems: 'flex-start', paddingTop: '1rem' }}>
+                            <Dropdown
+                                label="Select country"
+                                options={countryOptions}
+                                value={values.searchable}
+                                onChange={(v) => setValues(prev => ({ ...prev, searchable: v }))}
+                                searchable
+                                helperText="Start typing to filter options"
+                            />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Full Width</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column', width: '100%', paddingTop: '1rem' }}>
+                            <Dropdown
+                                label="Full width dropdown"
+                                options={basicOptions}
+                                value=""
+                                onChange={() => {}}
+                                fullWidth
+                            />
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Design Specifications</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Height</td>
+                                    <td><code>46px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Border (default)</td>
+                                    <td><code>1px solid #CCCCCC</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Border (open/focused)</td>
+                                    <td><code>1px solid #1565C0</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Border Radius</td>
+                                    <td><code>4px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Padding</td>
+                                    <td><code>12px left, 8px right, 12px top/bottom</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Shadow (open)</td>
+                                    <td><code>0px 2px 4px rgba(0,0,0,0.16)</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Text Font</td>
+                                    <td><code>Roboto Regular, 16px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Label Font</td>
+                                    <td><code>Roboto Regular, 12px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Option Font</td>
+                                    <td><code>Roboto Regular, 14px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Placeholder Color</td>
+                                    <td><code>#999999</code> (Gray 05)</td>
+                                </tr>
+                                <tr>
+                                    <td>Label Color (default)</td>
+                                    <td><code>#666666</code> (Gray 06)</td>
+                                </tr>
+                                <tr>
+                                    <td>Label Color (open)</td>
+                                    <td><code>#1565C0</code> (Blue 500)</td>
+                                </tr>
+                                <tr>
+                                    <td>Option Hover Background</td>
+                                    <td><code>#EFF5FF</code> (Light Blue 100)</td>
+                                </tr>
+                                <tr>
+                                    <td>Option Hover Text</td>
+                                    <td><code>#0F4888</code> (Blue 700)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>options</code></td>
+                                    <td><code>Array&lt;{'{value, label}'}&gt;</code></td>
+                                    <td>Required</td>
+                                    <td>Array of options</td>
+                                </tr>
+                                <tr>
+                                    <td><code>value</code></td>
+                                    <td><code>string</code></td>
+                                    <td>Required</td>
+                                    <td>Selected value</td>
+                                </tr>
+                                <tr>
+                                    <td><code>onChange</code></td>
+                                    <td><code>function</code></td>
+                                    <td>Required</td>
+                                    <td>Called when selection changes</td>
+                                </tr>
+                                <tr>
+                                    <td><code>label</code></td>
+                                    <td><code>string</code></td>
+                                    <td>-</td>
+                                    <td>Floating label text</td>
+                                </tr>
+                                <tr>
+                                    <td><code>required</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Show required asterisk</td>
+                                </tr>
+                                <tr>
+                                    <td><code>searchable</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Enable search filtering</td>
+                                </tr>
+                                <tr>
+                                    <td><code>error</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Show error state</td>
+                                </tr>
+                                <tr>
+                                    <td><code>fullWidth</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Take full container width</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { Dropdown } from '@kipu/design-system';
+
+// Basic usage
+const [country, setCountry] = useState('');
+
+<Dropdown
+  label="Country"
+  options={[
+    { value: 'us', label: 'United States' },
+    { value: 'ca', label: 'Canada' },
+  ]}
+  value={country}
+  onChange={setCountry}
+  required
+/>
+
+// Searchable dropdown
+<Dropdown
+  label="Search countries"
+  options={countries}
+  value={country}
+  onChange={setCountry}
+  searchable
+/>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

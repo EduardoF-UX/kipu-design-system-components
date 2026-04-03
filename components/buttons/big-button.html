@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Button - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Big Button Component - Matching Figma Design System
+        const BigButton = ({ 
+            children, 
+            variant = 'filled', 
+            state = 'enabled',
+            icon = null,
+            iconPosition = 'left',
+            onClick,
+            disabled = false,
+            fullWidth = false
+        }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            const isDisabled = disabled || state === 'disabled';
+
+            // Kipu Design System Colors (from Figma)
+            const colors = {
+                blue500: '#1565C0',      // Blue/blue-500-main
+                blue700: '#0F4888',      // Blue/blue-700 (hover state)
+                lightBlue100: '#EFF5FF', // Light Blue/light-blue-100 (hover bg)
+                white: '#FFFFFF',
+                gray04: '#CCCCCC',
+                gray05: '#999999',
+                alertRed: '#E50000',     // Alert/alert-red (tonal enabled)
+                red700: '#A84226',       // Red/red-700 (tonal hover)
+            };
+
+            const baseStyles = {
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                paddingTop: '12px',
+                paddingBottom: '12px',
+                paddingLeft: icon && iconPosition === 'left' ? '16px' : '24px',
+                paddingRight: icon && iconPosition === 'right' ? '16px' : '24px',
+                fontSize: '16px',
+                fontWeight: 500,
+                fontFamily: "'Roboto', sans-serif",
+                borderRadius: '100px',
+                cursor: isDisabled ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                border: 'none',
+                outline: 'none',
+                width: fullWidth ? '100%' : 'auto',
+                minHeight: '40px',
+                textTransform: 'uppercase',
+                letterSpacing: '0',
+                lineHeight: '100%',
+            };
+
+            // Figma enabled state styles
+            const variantStyles = {
+                filled: {
+                    background: isDisabled ? colors.gray04 : colors.blue500,
+                    color: colors.white,
+                    border: 'none',
+                    boxShadow: isDisabled ? 'none' : '0px 2px 12px 0px rgba(0, 0, 0, 0.12)',
+                },
+                outlined: {
+                    background: 'transparent',
+                    color: isDisabled ? colors.gray04 : colors.blue500,
+                    border: `2px solid ${isDisabled ? colors.gray04 : colors.blue500}`,
+                    boxShadow: 'none',
+                },
+                text: {
+                    background: 'transparent',
+                    color: isDisabled ? colors.gray04 : colors.blue500,
+                    border: 'none',
+                    boxShadow: 'none',
+                },
+                elevated: {
+                    background: isDisabled ? colors.gray04 : colors.white,
+                    color: isDisabled ? colors.gray05 : colors.blue500,
+                    border: 'none',
+                    boxShadow: isDisabled ? 'none' : '0px 1px 8px rgba(0, 0, 0, 0.14)',
+                },
+                tonal: {
+                    background: isDisabled ? colors.gray04 : colors.alertRed,
+                    color: colors.white,
+                    border: 'none',
+                    boxShadow: 'none',
+                },
+            };
+
+            // Figma hover state styles
+            const hoverStyles = {
+                filled: { 
+                    background: colors.blue700,
+                    boxShadow: '0px 2px 12px 0px rgba(0, 0, 0, 0.2)',
+                },
+                outlined: { 
+                    background: colors.lightBlue100,
+                    color: colors.blue700,
+                    border: `2px solid ${colors.blue700}`,
+                    boxShadow: '0px 1px 8px rgba(0, 0, 0, 0.14)',
+                },
+                text: { 
+                    background: colors.lightBlue100,
+                    color: colors.blue700,
+                },
+                elevated: { 
+                    color: colors.blue700,
+                    boxShadow: '0px 2px 16px rgba(0, 0, 0, 0.18)',
+                },
+                tonal: { 
+                    background: colors.red700,
+                },
+            };
+
+            const finalStyles = {
+                ...baseStyles,
+                ...variantStyles[variant],
+                ...(isHovered && !isDisabled ? hoverStyles[variant] : {}),
+            };
+
+            return (
+                <button
+                    style={finalStyles}
+                    onClick={onClick}
+                    disabled={isDisabled}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    {icon && iconPosition === 'left' && <span style={{ display: 'flex', width: '18px', height: '18px' }}>{icon}</span>}
+                    {children}
+                    {icon && iconPosition === 'right' && <span style={{ display: 'flex', width: '18px', height: '18px' }}>{icon}</span>}
+                </button>
+            );
+        };
+
+        // Icons (18x18 as per Figma specs)
+        const AddIcon = () => (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+        );
+
+        const ArrowIcon = () => (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+            </svg>
+        );
+
+        // Demo App
+        const App = () => {
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Buttons</span>
+                            <span>/</span>
+                            <span>Big Button</span>
+                        </div>
+                        <h1>Big Button</h1>
+                        <p className="description">
+                            Buttons communicate actions that users can take. They are typically placed 
+                            throughout your UI, in places like Dialogs, Modal windows, Forms, Cards and Toolbars.
+                            Big buttons have a height of 40px with 100px border radius (pill shape).
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>Variants</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                            Font: Roboto Medium 16px, uppercase • Padding: 12px top/bottom, 24px left/right • Icon: 18×18px
+                        </p>
+                        <div className="preview-area">
+                            <div className="preview-row">
+                                <div className="preview-column">
+                                    <span className="variant-label">Filled (Main)</span>
+                                    <BigButton variant="filled">Enabled</BigButton>
+                                </div>
+                                <div className="preview-column">
+                                    <span className="variant-label">Outlined</span>
+                                    <BigButton variant="outlined">Enabled</BigButton>
+                                </div>
+                                <div className="preview-column">
+                                    <span className="variant-label">Text</span>
+                                    <BigButton variant="text">Enabled</BigButton>
+                                </div>
+                                <div className="preview-column">
+                                    <span className="variant-label">Elevated</span>
+                                    <BigButton variant="elevated">Enabled</BigButton>
+                                </div>
+                                <div className="preview-column">
+                                    <span className="variant-label">Tonal</span>
+                                    <BigButton variant="tonal">Enabled</BigButton>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>States</h2>
+                        <div className="state-grid">
+                            <div className="state-item">
+                                <span className="label">Enabled</span>
+                                <BigButton variant="filled">Enabled</BigButton>
+                            </div>
+                            <div className="state-item">
+                                <span className="label">Disabled</span>
+                                <BigButton variant="filled" disabled>Disabled</BigButton>
+                            </div>
+                        </div>
+                        
+                        <h3>Outlined States</h3>
+                        <div className="state-grid" style={{ marginTop: '1rem' }}>
+                            <div className="state-item">
+                                <span className="label">Enabled</span>
+                                <BigButton variant="outlined">Enabled</BigButton>
+                            </div>
+                            <div className="state-item">
+                                <span className="label">Disabled</span>
+                                <BigButton variant="outlined" disabled>Disabled</BigButton>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>With Icons</h2>
+                        <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                            Icons are 18×18px. Left padding reduces to 16px when icon is on left.
+                        </p>
+                        <div className="preview-area">
+                            <BigButton variant="filled" icon={<AddIcon />}>
+                                Enabled
+                            </BigButton>
+                            <BigButton variant="outlined" icon={<ArrowIcon />} iconPosition="right">
+                                Continue
+                            </BigButton>
+                            <BigButton variant="tonal" icon={<AddIcon />}>
+                                Create
+                            </BigButton>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Full Width</h2>
+                        <div className="preview-area" style={{ flexDirection: 'column' }}>
+                            <BigButton variant="filled" fullWidth>
+                                Full Width Button
+                            </BigButton>
+                            <BigButton variant="outlined" fullWidth>
+                                Full Width Outlined
+                            </BigButton>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Design Specifications</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Enabled</th>
+                                    <th>Hover</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Font</td>
+                                    <td colSpan="2"><code>Roboto Medium, 16px, uppercase</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Border Radius</td>
+                                    <td colSpan="2"><code>100px</code> (pill shape)</td>
+                                </tr>
+                                <tr>
+                                    <td>Height</td>
+                                    <td colSpan="2"><code>40px</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Padding</td>
+                                    <td colSpan="2"><code>12px 24px</code> (no icon) / <code>12px 24px 12px 16px</code> (with icon)</td>
+                                </tr>
+                                <tr>
+                                    <td>Icon Size / Gap</td>
+                                    <td colSpan="2"><code>18×18px</code> / <code>8px</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3 style={{ marginTop: '24px', marginBottom: '12px' }}>Color Tokens by Variant</h3>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Variant</th>
+                                    <th>Enabled</th>
+                                    <th>Hover</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Filled</td>
+                                    <td>bg: <code>#1565C0</code>, text: white, shadow: <code>0px 2px 12px rgba(0,0,0,0.12)</code></td>
+                                    <td>bg: <code>#0F4888</code>, shadow: <code>rgba(0,0,0,0.2)</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Outlined</td>
+                                    <td>border: <code>2px solid #1565C0</code>, text: <code>#1565C0</code></td>
+                                    <td>bg: <code>#EFF5FF</code>, border: <code>#0F4888</code>, text: <code>#0F4888</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Text</td>
+                                    <td>text: <code>#1565C0</code></td>
+                                    <td>bg: <code>#EFF5FF</code>, text: <code>#0F4888</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Elevated</td>
+                                    <td>bg: white, text: <code>#1565C0</code>, shadow: <code>0px 1px 8px rgba(0,0,0,0.14)</code></td>
+                                    <td>text: <code>#0F4888</code>, shadow: <code>0px 2px 16px rgba(0,0,0,0.18)</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Tonal</td>
+                                    <td>bg: <code>#E50000</code> (Alert Red), text: white</td>
+                                    <td>bg: <code>#A84226</code> (Red 700), text: white</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>variant</code></td>
+                                    <td><code>'filled' | 'outlined' | 'text' | 'elevated' | 'tonal'</code></td>
+                                    <td><code>'filled'</code></td>
+                                    <td>The visual style variant of the button</td>
+                                </tr>
+                                <tr>
+                                    <td><code>disabled</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Whether the button is disabled</td>
+                                </tr>
+                                <tr>
+                                    <td><code>icon</code></td>
+                                    <td><code>ReactNode</code></td>
+                                    <td><code>null</code></td>
+                                    <td>Icon element to display (18×18px)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>iconPosition</code></td>
+                                    <td><code>'left' | 'right'</code></td>
+                                    <td><code>'left'</code></td>
+                                    <td>Position of the icon relative to text</td>
+                                </tr>
+                                <tr>
+                                    <td><code>fullWidth</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Whether button takes full container width</td>
+                                </tr>
+                                <tr>
+                                    <td><code>onClick</code></td>
+                                    <td><code>function</code></td>
+                                    <td>-</td>
+                                    <td>Click event handler</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { BigButton } from '@kipu/design-system';
+
+// Filled button (primary action)
+<BigButton variant="filled">Save</BigButton>
+
+// Outlined button (secondary action)
+<BigButton variant="outlined">Cancel</BigButton>
+
+// With icon
+<BigButton variant="filled" icon={<AddIcon />}>
+  Add Item
+</BigButton>
+
+// Disabled state
+<BigButton variant="filled" disabled>
+  Cannot Click
+</BigButton>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

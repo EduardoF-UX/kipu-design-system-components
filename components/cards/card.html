@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card - Kipu Design System</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Card Component
+        const Card = ({ 
+            children,
+            variant = 'elevated',
+            padding = 'medium',
+            onClick,
+            hoverable = false,
+        }) => {
+            const [isHovered, setIsHovered] = useState(false);
+
+            const paddings = {
+                none: '0',
+                small: '12px',
+                medium: '16px',
+                large: '24px',
+            };
+
+            const baseStyles = {
+                background: 'white',
+                borderRadius: '12px',
+                padding: paddings[padding],
+                transition: 'all 0.2s ease',
+                cursor: onClick ? 'pointer' : 'default',
+            };
+
+            const variantStyles = {
+                elevated: {
+                    boxShadow: isHovered && hoverable 
+                        ? '0 8px 24px rgba(0,0,0,0.15)'
+                        : '0 2px 12px rgba(0,0,0,0.08)',
+                    transform: isHovered && hoverable ? 'translateY(-2px)' : 'none',
+                },
+                outlined: {
+                    border: '1px solid #e2e8f0',
+                    boxShadow: isHovered && hoverable ? '0 4px 12px rgba(0,0,0,0.1)' : 'none',
+                },
+                filled: {
+                    background: '#f8fafc',
+                },
+            };
+
+            return (
+                <div
+                    style={{ ...baseStyles, ...variantStyles[variant] }}
+                    onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    {children}
+                </div>
+            );
+        };
+
+        // Card Header Component
+        const CardHeader = ({ title, subtitle, action }) => (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                <div>
+                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#1e293b' }}>{title}</h3>
+                    {subtitle && <p style={{ margin: '4px 0 0', fontSize: '14px', color: '#64748b' }}>{subtitle}</p>}
+                </div>
+                {action && <div>{action}</div>}
+            </div>
+        );
+
+        // Card Content Component
+        const CardContent = ({ children }) => (
+            <div style={{ color: '#475569' }}>
+                {children}
+            </div>
+        );
+
+        // Card Actions Component
+        const CardActions = ({ children, align = 'left' }) => (
+            <div style={{ 
+                display: 'flex', 
+                gap: '8px', 
+                marginTop: '16px',
+                justifyContent: align === 'right' ? 'flex-end' : 'flex-start'
+            }}>
+                {children}
+            </div>
+        );
+
+        // Kipu Design System SmallButton (matching Figma exactly)
+        const Button = ({ children, variant = 'filled', onClick, disabled = false }) => {
+            const [isHovered, setIsHovered] = React.useState(false);
+            
+            const colors = {
+                blue500: '#1565C0',
+                blue700: '#0F4888',
+                lightBlue100: '#EFF5FF',
+                white: '#FFFFFF',
+                gray04: '#CCCCCC',
+            };
+            
+            const baseStyles = {
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: 500,
+                fontFamily: "'Roboto', sans-serif",
+                borderRadius: '100px',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                minHeight: '38px',
+                textTransform: 'uppercase',
+                letterSpacing: '0',
+                lineHeight: '100%',
+                border: 'none',
+                outline: 'none',
+                opacity: disabled ? 0.6 : 1,
+            };
+            
+            const getVariantStyles = () => {
+                if (variant === 'filled') {
+                    return {
+                        background: disabled ? colors.gray04 : (isHovered ? colors.blue700 : colors.blue500),
+                        color: colors.white,
+                        boxShadow: disabled ? 'none' : (isHovered ? '0px 2px 12px rgba(0, 0, 0, 0.2)' : '0px 2px 12px rgba(0, 0, 0, 0.12)'),
+                    };
+                }
+                if (variant === 'outlined') {
+                    return {
+                        background: isHovered && !disabled ? colors.lightBlue100 : 'transparent',
+                        color: disabled ? colors.gray04 : (isHovered ? colors.blue700 : colors.blue500),
+                        border: `2px solid ${disabled ? colors.gray04 : (isHovered ? colors.blue700 : colors.blue500)}`,
+                        boxShadow: isHovered && !disabled ? '0px 1px 8px rgba(0, 0, 0, 0.14)' : 'none',
+                    };
+                }
+                if (variant === 'text') {
+                    return {
+                        background: isHovered && !disabled ? colors.lightBlue100 : 'transparent',
+                        color: disabled ? colors.gray04 : (isHovered ? colors.blue700 : colors.blue500),
+                        boxShadow: 'none',
+                    };
+                }
+                return {};
+            };
+            
+            return (
+                <button 
+                    style={{ ...baseStyles, ...getVariantStyles() }} 
+                    onClick={onClick}
+                    disabled={disabled}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    {children}
+                </button>
+            );
+        };
+
+        // Icon Button for demo
+        const IconButton = ({ children }) => (
+            <button style={{
+                width: 32, height: 32, borderRadius: '50%', border: 'none',
+                background: 'transparent', cursor: 'pointer', display: 'flex',
+                alignItems: 'center', justifyContent: 'center'
+            }}>
+                {children}
+            </button>
+        );
+
+        const MoreIcon = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#64748b">
+                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+        );
+
+        // Demo App
+        const App = () => {
+            return (
+                <div className="page-container">
+                    <a href="../../kipu-design-system-components.html" className="back-link">
+                        ← Back to Components
+                    </a>
+                    
+                    <header className="component-header">
+                        <div className="breadcrumb">
+                            <a href="../../kipu-design-system-components.html">Components</a>
+                            <span>/</span>
+                            <span>Cards</span>
+                            <span>/</span>
+                            <span>Card</span>
+                        </div>
+                        <h1>Card</h1>
+                        <p className="description">
+                            Cards contain content and actions about a single subject. They should be 
+                            easy to scan for relevant and actionable information.
+                        </p>
+                    </header>
+
+                    <section className="component-section">
+                        <h2>Variants</h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+                            <div className="preview-column">
+                                <span className="variant-label">Elevated</span>
+                                <Card variant="elevated">
+                                    <CardHeader title="Elevated Card" />
+                                    <CardContent>
+                                        <p>This card uses a shadow to create depth.</p>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Outlined</span>
+                                <Card variant="outlined">
+                                    <CardHeader title="Outlined Card" />
+                                    <CardContent>
+                                        <p>This card uses a border instead of shadow.</p>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Filled</span>
+                                <Card variant="filled">
+                                    <CardHeader title="Filled Card" />
+                                    <CardContent>
+                                        <p>This card has a subtle background color.</p>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Interactive Cards</h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+                            <Card variant="elevated" hoverable onClick={() => alert('Card clicked!')}>
+                                <CardHeader title="Clickable Card" subtitle="Click me!" />
+                                <CardContent>
+                                    <p>This card responds to hover and click events.</p>
+                                </CardContent>
+                            </Card>
+                            <Card variant="outlined" hoverable>
+                                <CardHeader title="Hoverable Card" subtitle="Hover effect only" />
+                                <CardContent>
+                                    <p>This card only has hover effects, no click action.</p>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Card with Actions</h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+                            <Card variant="elevated">
+                                <CardHeader 
+                                    title="Patient Record" 
+                                    subtitle="Last updated: Today"
+                                    action={<IconButton><MoreIcon /></IconButton>}
+                                />
+                                <CardContent>
+                                    <p>View and manage patient information, medical history, and treatment plans.</p>
+                                </CardContent>
+                                <CardActions>
+                                    <Button variant="filled">View Details</Button>
+                                    <Button variant="outlined">Edit</Button>
+                                </CardActions>
+                            </Card>
+                            <Card variant="elevated">
+                                <CardHeader 
+                                    title="Appointment" 
+                                    subtitle="March 15, 2026 at 2:00 PM"
+                                />
+                                <CardContent>
+                                    <p>Scheduled appointment with Dr. Smith for routine checkup.</p>
+                                </CardContent>
+                                <CardActions align="right">
+                                    <Button variant="outlined">Reschedule</Button>
+                                    <Button variant="filled">Confirm</Button>
+                                </CardActions>
+                            </Card>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Padding Options</h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
+                            <div className="preview-column">
+                                <span className="variant-label">Small</span>
+                                <Card padding="small">
+                                    <p style={{ margin: 0 }}>Small padding</p>
+                                </Card>
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Medium (default)</span>
+                                <Card padding="medium">
+                                    <p style={{ margin: 0 }}>Medium padding</p>
+                                </Card>
+                            </div>
+                            <div className="preview-column">
+                                <span className="variant-label">Large</span>
+                                <Card padding="large">
+                                    <p style={{ margin: 0 }}>Large padding</p>
+                                </Card>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Props</h2>
+                        <table className="props-table">
+                            <thead>
+                                <tr>
+                                    <th>Prop</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>variant</code></td>
+                                    <td><code>'elevated' | 'outlined' | 'filled'</code></td>
+                                    <td><code>'elevated'</code></td>
+                                    <td>Visual style of the card</td>
+                                </tr>
+                                <tr>
+                                    <td><code>padding</code></td>
+                                    <td><code>'none' | 'small' | 'medium' | 'large'</code></td>
+                                    <td><code>'medium'</code></td>
+                                    <td>Internal padding</td>
+                                </tr>
+                                <tr>
+                                    <td><code>hoverable</code></td>
+                                    <td><code>boolean</code></td>
+                                    <td><code>false</code></td>
+                                    <td>Enable hover effects</td>
+                                </tr>
+                                <tr>
+                                    <td><code>onClick</code></td>
+                                    <td><code>function</code></td>
+                                    <td>-</td>
+                                    <td>Click handler</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section className="component-section">
+                        <h2>Usage</h2>
+                        <div className="code-block">
+{`import { Card, CardHeader, CardContent, CardActions } from '@kipu/design-system';
+
+// Basic card
+<Card>
+  <CardHeader title="Card Title" subtitle="Subtitle" />
+  <CardContent>
+    <p>Card content goes here.</p>
+  </CardContent>
+</Card>
+
+// Interactive card with actions
+<Card variant="elevated" hoverable>
+  <CardHeader title="Patient" action={<IconButton />} />
+  <CardContent>
+    <p>Patient information</p>
+  </CardContent>
+  <CardActions>
+    <Button>View</Button>
+    <Button variant="outlined">Edit</Button>
+  </CardActions>
+</Card>`}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
