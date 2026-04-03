@@ -1,0 +1,44 @@
+{
+  "Dark-Blue": {
+    "$type": "color",
+    "$value": "#145aaa"
+  },
+  "Kipu-Blue": {
+    "$type": "color",
+    "$value": "#1565c0"
+  },
+  "Alert-Red": {
+    "$type": "color",
+    "$value": "#d00b0b"
+  },
+  "Alert-Red-Dark": {
+    "$type": "color",
+    "$value": "#cf1111"
+  },
+  "Alert-Red-Light": {
+    "$type": "color",
+    "$value": "#edcdcd"
+  },
+  "String": {
+    "$type": "string",
+    "$value": "Item value"
+  },
+  "Patient_Name": {
+    "$type": "string",
+    "$value": "Jane Smith - She/Her"
+  },
+  "Patient_Name_": {
+    "_Gender": {
+      "$type": "string",
+      "$value": "Jane Smith - She/Her"
+    }
+  },
+  "Placeholder": {
+    "$type": "string",
+    "$value": "String value"
+  },
+  "Label": {
+    "$type": "string",
+    "$value": "Notifications was successfully disabled"
+  }
+}
