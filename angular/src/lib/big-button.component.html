@@ -1,0 +1,29 @@
+<button
+  [ngStyle]="buttonStyles"
+  [disabled]="disabled"
+  (click)="onClick($event)"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+  type="button"
+>
+  <!-- Left Icon -->
+  <span 
+    *ngIf="iconPosition === 'left'" 
+    class="kipu-big-button__icon"
+    style="display: flex; width: 18px; height: 18px;"
+  >
+    <ng-content select="[icon]"></ng-content>
+  </span>
+  
+  <!-- Button Text -->
+  <ng-content></ng-content>
+  
+  <!-- Right Icon -->
+  <span 
+    *ngIf="iconPosition === 'right'" 
+    class="kipu-big-button__icon"
+    style="display: flex; width: 18px; height: 18px;"
+  >
+    <ng-content select="[icon]"></ng-content>
+  </span>
+</button>

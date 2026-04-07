@@ -1,0 +1,30 @@
+// Kipu Design System - Big Button Component Styles
+// These styles are applied via ngStyle for dynamic theming
+// This file contains fallback/base styles
+
+:host {
+  display: inline-block;
+  
+  &.kipu-big-button--full-width {
+    display: block;
+    width: 100%;
+  }
+}
+
+.kipu-big-button {
+  // Base styles are applied via ngStyle
+  // Icon styling
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    
+    svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+  }
+}

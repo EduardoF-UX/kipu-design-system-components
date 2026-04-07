@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angular Big Button Demo - Kipu Design System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            padding: 40px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1565C0;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+        
+        h2 {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        
+        .section {
+            margin-bottom: 32px;
+        }
+        
+        .preview-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .preview-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        
+        .code-block .keyword { color: #569cd6; }
+        .code-block .string { color: #ce9178; }
+        .code-block .comment { color: #6a9955; }
+        .code-block .tag { color: #4ec9b0; }
+        .code-block .attr { color: #9cdcfe; }
+        
+        /* Simulated Button Styles (matching Angular component) */
+        .kipu-big-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            font-family: 'Roboto', sans-serif;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            outline: none;
+            min-height: 40px;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            line-height: 100%;
+        }
+        
+        .kipu-big-button--filled {
+            background: #1565C0;
+            color: white;
+            box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.12);
+        }
+        .kipu-big-button--filled:hover {
+            background: #0F4888;
+            box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.2);
+        }
+        
+        .kipu-big-button--outlined {
+            background: transparent;
+            color: #1565C0;
+            border: 2px solid #1565C0;
+        }
+        .kipu-big-button--outlined:hover {
+            background: #EFF5FF;
+            color: #0F4888;
+            border-color: #0F4888;
+            box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.14);
+        }
+        
+        .kipu-big-button--text {
+            background: transparent;
+            color: #1565C0;
+        }
+        .kipu-big-button--text:hover {
+            background: #EFF5FF;
+            color: #0F4888;
+        }
+        
+        .kipu-big-button--elevated {
+            background: white;
+            color: #1565C0;
+            box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.14);
+        }
+        .kipu-big-button--elevated:hover {
+            color: #0F4888;
+            box-shadow: 0px 2px 16px rgba(0, 0, 0, 0.18);
+        }
+        
+        .kipu-big-button--tonal {
+            background: #E50000;
+            color: white;
+        }
+        .kipu-big-button--tonal:hover {
+            background: #A84226;
+        }
+        
+        .kipu-big-button--disabled {
+            background: #CCCCCC;
+            color: white;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .kipu-big-button__icon {
+            display: flex;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .kipu-big-button__icon svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Angular Big Button Component</h1>
+        <p class="subtitle">Kipu Design System - Angular Implementation Preview</p>
+        
+        <div class="section">
+            <h2>Variants</h2>
+            <div class="preview-row">
+                <div class="preview-item">
+                    <span class="label">Filled</span>
+                    <button class="kipu-big-button kipu-big-button--filled">Enabled</button>
+                </div>
+                <div class="preview-item">
+                    <span class="label">Outlined</span>
+                    <button class="kipu-big-button kipu-big-button--outlined">Enabled</button>
+                </div>
+                <div class="preview-item">
+                    <span class="label">Text</span>
+                    <button class="kipu-big-button kipu-big-button--text">Enabled</button>
+                </div>
+                <div class="preview-item">
+                    <span class="label">Elevated</span>
+                    <button class="kipu-big-button kipu-big-button--elevated">Enabled</button>
+                </div>
+                <div class="preview-item">
+                    <span class="label">Tonal</span>
+                    <button class="kipu-big-button kipu-big-button--tonal">Enabled</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>With Icons</h2>
+            <div class="preview-row">
+                <button class="kipu-big-button kipu-big-button--filled">
+                    <span class="kipu-big-button__icon">
+                        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    </span>
+                    Add Item
+                </button>
+                <button class="kipu-big-button kipu-big-button--outlined">
+                    Continue
+                    <span class="kipu-big-button__icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </span>
+                </button>
+                <button class="kipu-big-button kipu-big-button--tonal">
+                    <span class="kipu-big-button__icon">
+                        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    </span>
+                    Create
+                </button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>States</h2>
+            <div class="preview-row">
+                <div class="preview-item">
+                    <span class="label">Enabled</span>
+                    <button class="kipu-big-button kipu-big-button--filled">Enabled</button>
+                </div>
+                <div class="preview-item">
+                    <span class="label">Disabled</span>
+                    <button class="kipu-big-button kipu-big-button--disabled" disabled>Disabled</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Angular Usage</h2>
+            <div class="code-block"><span class="comment">// Import the module</span>
+<span class="keyword">import</span> { KipuBigButtonModule } <span class="keyword">from</span> <span class="string">'@kipu/design-system-angular'</span>;
+
+<span class="comment">// Add to NgModule imports</span>
+@NgModule({
+  imports: [KipuBigButtonModule]
+})
+
+<span class="comment">// Use in template</span>
+&lt;<span class="tag">kipu-big-button</span> <span class="attr">variant</span>=<span class="string">"filled"</span> (<span class="attr">buttonClick</span>)=<span class="string">"onSave()"</span>&gt;
+  Save
+&lt;/<span class="tag">kipu-big-button</span>&gt;
+
+<span class="comment">// With icon</span>
+&lt;<span class="tag">kipu-big-button</span> <span class="attr">variant</span>=<span class="string">"outlined"</span>&gt;
+  &lt;<span class="tag">svg</span> <span class="attr">icon</span>&gt;...&lt;/<span class="tag">svg</span>&gt;
+  Add Item
+&lt;/<span class="tag">kipu-big-button</span>&gt;</div>
+        </div>
+    </div>
+</body>
+</html>
