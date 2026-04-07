@@ -86,7 +86,7 @@ A large button component with 40px height and pill shape (100px border radius).
 |-------|------|-------------|
 | `buttonClick` | `EventEmitter<MouseEvent>` | Emitted when button is clicked |
 
-## Design Specifications
+## Design Specifications - BigButton
 
 | Property | Value |
 |----------|-------|
@@ -106,3 +106,82 @@ A large button component with 40px height and pill shape (100px border radius).
 | Text | text: #1565C0 | bg: #EFF5FF, text: #0F4888 |
 | Elevated | bg: white, text: #1565C0 | shadow increases |
 | Tonal | bg: #E50000 (red), text: white | bg: #A84226 |
+
+---
+
+### TextField
+
+A text input component with floating label and validation states.
+
+#### Usage
+
+```html
+<!-- Basic usage with ngModel -->
+<kipu-text-field
+  label="Email"
+  [(ngModel)]="email"
+  placeholder="Enter your email"
+  [required]="true"
+></kipu-text-field>
+
+<!-- With leading icon -->
+<kipu-text-field label="Search">
+  <svg leadingIcon width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M15.5 14h-.79l-.28-.27..."/>
+  </svg>
+</kipu-text-field>
+
+<!-- With trailing icon -->
+<kipu-text-field label="Password" type="password">
+  <svg trailingIcon width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 4.5C7 4.5..."/>
+  </svg>
+</kipu-text-field>
+
+<!-- Error state -->
+<kipu-text-field
+  label="Email"
+  [error]="true"
+  errorText="Please enter a valid email"
+></kipu-text-field>
+
+<!-- Disabled -->
+<kipu-text-field label="Disabled" [disabled]="true"></kipu-text-field>
+
+<!-- Full width -->
+<kipu-text-field label="Notes" [fullWidth]="true"></kipu-text-field>
+```
+
+#### Properties
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `label` | `string` | `''` | Floating label text |
+| `placeholder` | `string` | `'Placeholder'` | Placeholder text |
+| `type` | `'text' \| 'password' \| 'email' \| 'number' \| 'tel' \| 'url'` | `'text'` | Input type |
+| `disabled` | `boolean` | `false` | Whether field is disabled |
+| `required` | `boolean` | `false` | Show required asterisk |
+| `error` | `boolean` | `false` | Show error state |
+| `errorText` | `string` | `''` | Error message |
+| `helperText` | `string` | `''` | Helper text below input |
+| `fullWidth` | `boolean` | `false` | Full container width |
+
+#### Events
+
+| Event | Type | Description |
+|-------|------|-------------|
+| `valueChange` | `EventEmitter<string>` | Emitted when value changes |
+
+## Design Specifications - TextField
+
+| Property | Value |
+|----------|-------|
+| Height | 46px |
+| Border Radius | 4px |
+| Border (default) | 1px solid #CCCCCC |
+| Border (focused) | 2px solid #1565C0 |
+| Border (error) | 2px solid #E50000 |
+| Input Font | Roboto Regular, 16px |
+| Label Font | Roboto Regular, 12px |
+| Padding | 14px 10px 12px 14px |
+| Icon Size | 18×18px |

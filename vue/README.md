@@ -132,10 +132,104 @@ const onCancel = () => console.log('Cancel clicked');
 | Elevated | bg: white, text: #1565C0 | shadow increases |
 | Tonal | bg: #E50000 (red), text: white | bg: #A84226 |
 
+---
+
+### TextField
+
+A text input component with floating label and validation states.
+
+#### Usage
+
+```vue
+<template>
+  <!-- Basic usage with v-model -->
+  <KipuTextField
+    v-model="email"
+    label="Email"
+    placeholder="Enter your email"
+    :required="true"
+  />
+
+  <!-- With leading icon -->
+  <KipuTextField label="Search">
+    <template #leadingIcon>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M15.5 14h-.79l-.28-.27..."/>
+      </svg>
+    </template>
+  </KipuTextField>
+
+  <!-- With trailing icon -->
+  <KipuTextField label="Password" type="password">
+    <template #trailingIcon>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 4.5C7 4.5..."/>
+      </svg>
+    </template>
+  </KipuTextField>
+
+  <!-- Error state -->
+  <KipuTextField
+    v-model="email"
+    label="Email"
+    :error="true"
+    error-text="Please enter a valid email"
+  />
+
+  <!-- Disabled -->
+  <KipuTextField label="Disabled" :disabled="true" />
+
+  <!-- Full width -->
+  <KipuTextField label="Notes" :full-width="true" />
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const email = ref('');
+</script>
+```
+
+#### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `modelValue` | `string` | `''` | v-model binding |
+| `label` | `string` | `''` | Floating label text |
+| `placeholder` | `string` | `'Placeholder'` | Placeholder text |
+| `type` | `'text' \| 'password' \| 'email' \| 'number' \| 'tel' \| 'url'` | `'text'` | Input type |
+| `disabled` | `boolean` | `false` | Whether field is disabled |
+| `required` | `boolean` | `false` | Show required asterisk |
+| `error` | `boolean` | `false` | Show error state |
+| `errorText` | `string` | `''` | Error message |
+| `helperText` | `string` | `''` | Helper text below input |
+| `fullWidth` | `boolean` | `false` | Full container width |
+
+#### Slots
+
+| Slot | Description |
+|------|-------------|
+| `leadingIcon` | Icon at start of input (18×18px) |
+| `trailingIcon` | Icon at end of input (18×18px) |
+
+## Design Specifications - TextField
+
+| Property | Value |
+|----------|-------|
+| Height | 46px |
+| Border Radius | 4px |
+| Border (default) | 1px solid #CCCCCC |
+| Border (focused) | 2px solid #1565C0 |
+| Border (error) | 2px solid #E50000 |
+| Input Font | Roboto Regular, 16px |
+| Label Font | Roboto Regular, 12px |
+| Padding | 14px 10px 12px 14px |
+| Icon Size | 18×18px |
+
 ## TypeScript Support
 
 The library is fully typed. Import types as needed:
 
 ```typescript
-import type { ButtonVariant, IconPosition } from '@kipu/design-system-vue';
+import type { ButtonVariant, IconPosition, TextFieldType } from '@kipu/design-system-vue';
 ```

@@ -1,0 +1,15 @@
+// Kipu Design System - Text Field Component Styles
+
+:host {
+  display: block;
+}
+
+// Icon styling
+[leadingIcon],
+[trailingIcon] {
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+}

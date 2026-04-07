@@ -5,15 +5,18 @@
 
 import type { App } from 'vue';
 import BigButton from './BigButton.vue';
+import TextField from './TextField.vue';
 
 // Export individual components
-export { BigButton };
+export { BigButton, TextField };
 export type { ButtonVariant, IconPosition } from './BigButton.vue';
+export type { TextFieldType } from './TextField.vue';
 
 // Export plugin for app.use()
 export default {
   install(app: App) {
     app.component('KipuBigButton', BigButton);
+    app.component('KipuTextField', TextField);
   },
 };
 
@@ -21,5 +24,6 @@ export default {
 export const KipuDesignSystem = {
   install(app: App) {
     app.component('KipuBigButton', BigButton);
+    app.component('KipuTextField', TextField);
   },
 };

@@ -1,0 +1,36 @@
+<div [ngStyle]="containerStyles">
+  <div [ngStyle]="fieldStyles">
+    <!-- Leading Icon -->
+    <span [ngStyle]="iconStyles">
+      <ng-content select="[leadingIcon]"></ng-content>
+    </span>
+    
+    <!-- Input -->
+    <input
+      [type]="type"
+      [value]="value"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [ngStyle]="inputStyles"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+    />
+    
+    <!-- Trailing Icon -->
+    <span [ngStyle]="iconStyles">
+      <ng-content select="[trailingIcon]"></ng-content>
+    </span>
+  </div>
+  
+  <!-- Floating Label -->
+  <div *ngIf="label" [ngStyle]="labelStyles">
+    <span>{{ label }}</span>
+    <span *ngIf="required">*</span>
+  </div>
+  
+  <!-- Helper/Error Text -->
+  <span *ngIf="showHelper" [ngStyle]="helperStyles">
+    {{ displayHelperText }}
+  </span>
+</div>
