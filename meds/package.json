@@ -1,0 +1,17 @@
+{
+  "name": "uplift-doctor-order",
+  "version": "1.0.0",
+  "description": "Kipu EMR Prototype - UpliftDoctorOrder",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 3000 -o",
+    "dev": "npx http-server -p 3000 -o -c-1",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": ["kipu", "emr", "prototype", "medical"],
+  "author": "UpliftDoctorOrder",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
